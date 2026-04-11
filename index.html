@@ -20,6 +20,8 @@
         .tela-active { display: block; opacity: 1; }
         #msgLogin { color: #dc2626; font-weight: 600; text-align: center; margin-top: 15px; font-size: 14px;}
         
+        .caixa-aviso { font-size: 13px; color: #854d0e; background-color: #fef08a; padding: 12px; margin-top: 25px; border-radius: 6px; text-align: justify; border: 1px solid #fde047; line-height: 1.5; display: block;}
+        
         .card-historico { border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-top: 15px; background-color: #ffffff;}
         .card-cabecalho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px;}
         .card-protocolo { font-weight: 700; font-size: 13px;}
@@ -34,7 +36,8 @@
         .rodape-seguranca { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.6;}
         .rodape-seguranca strong { color: #10b981; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; margin-bottom: 5px;}
 
-        #secaoTamanho { display: none; }
+        /* Esconde os detalhes do pedido até que o item seja selecionado */
+        #detalhesPedido { display: none; }
 
         #overlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(255,255,255,0.85); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .dots-loader { display: flex; gap: 8px; }
@@ -82,7 +85,7 @@
             <input type="hidden" id="cpfValidado">
             
             <label>Item:</label>
-            <select id="item" required onchange="controlarCampoTamanho(this.value)">
+            <select id="item" required onchange="controlarCamposDinamicos(this.value)">
                 <option value="">Selecione...</option>
                 <option value="Boné">Boné</option>
                 <option value="Fiel">Fiel</option>
@@ -97,20 +100,27 @@
                 <option value="Coturno">Coturno</option>
             </select>
             
-            <div id="secaoTamanho">
-                <label>Tamanho / Numeração:</label>
-                <div id="wrapperTamanho">
-                   <input type="text" id="tamanho" placeholder="Ex: M, G, 42">
+            <div id="detalhesPedido">
+                <div id="secaoTamanho">
+                    <label>Tamanho / Numeração:</label>
+                    <div id="wrapperTamanho">
+                       <input type="text" id="tamanho" placeholder="Ex: M, G, 42">
+                    </div>
                 </div>
+                
+                <label>Motivo da Troca:</label>
+                <input type="text" id="motivo" placeholder="Ex: Desgaste, rasgo, tamanho errado" required>
+                
+                <label>Foto da peça atual:</label>
+                <input type="file" id="foto" accept="image/*" capture="environment" required>
+                
+                <div class="caixa-aviso">
+                    <strong>Aviso da Gestão:</strong> O envio desta solicitação não garante a troca imediata. A substituição está sujeita a análise da condição do item e disponibilidade em estoque.
+                </div>
+
+                <button type="submit">Enviar Solicitação</button>
             </div>
-            
-            <label>Motivo da Troca:</label>
-            <input type="text" id="motivo" placeholder="Ex: Desgaste, rasgo, numeração alterada" required>
-            
-            <label>Foto da peça atual:</label>
-            <input type="file" id="foto" accept="image/*" capture="environment" required>
-            
-            <button type="submit">Enviar Solicitação</button>
+
             <button type="button" class="btn-secundario" onclick="abrirTela('telaMenu')">Cancelar</button>
         </form>
     </div>
@@ -128,18 +138,10 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzb6ubyTJrb4BT5bvWv20NtT_R7P_VSXOOztTVYagRiKoKGCghZ8pmqXIgFzDaqiv61Ew/exec";
 
     window.addEventListener('contextmenu', e => e.preventDefault());
-    
-    function mostrarCarregando(t) { 
-        document.getElementById('loaderTexto').innerText = t; 
-        document.getElementById('overlay').style.display = 'flex'; 
-    }
-    function ocultarCarregando() { 
-        document.getElementById('overlay').style.display = 'none'; 
-    }
+    function mostrarCarregando(t) { document.getElementById('loaderTexto').innerText = t; document.getElementById('overlay').style.display = 'flex'; }
+    function ocultarCarregando() { document.getElementById('overlay').style.display = 'none'; }
     
     let historicoGeral = [];
-
-
     let nomeUsuarioGlobal = "";
     let matriculaUsuarioGlobal = "";
     let cpfUsuarioGlobal = "";
@@ -157,21 +159,24 @@
         abrirTela('telaLogin');
     }
 
-    function controlarCampoTamanho(val) {
-        const secao = document.getElementById('secaoTamanho');
-        const wrapper = document.getElementById('wrapperTamanho');
+
+    function controlarCamposDinamicos(val) {
+        const detalhes = document.getElementById('detalhesPedido');
+        const wrapperTamanho = document.getElementById('wrapperTamanho');
         const itensUnico = ["Boné", "Fiel", "Apito", "Cinturão(preto)", "Coldre", "Cinta(azul)"];
         
         if (!val) {
-            secao.style.display = 'none';
+            detalhes.style.display = 'none'; 
         } else {
-            secao.style.display = 'block';
+            detalhes.style.display = 'block'; 
+            
+
             if (itensUnico.includes(val)) {
-                wrapper.innerHTML = '<input type="text" id="tamanho" value="UNICO" class="readonly" readonly required>';
+                wrapperTamanho.innerHTML = '<input type="text" id="tamanho" value="UNICO" class="readonly" readonly required>';
             } else if (val === "Capa de Colete") {
-                wrapper.innerHTML = '<select id="tamanho" required><option value="">Selecione...</option><option value="G">G</option><option value="GG">GG</option></select>';
+                wrapperTamanho.innerHTML = '<select id="tamanho" required><option value="">Selecione...</option><option value="G">G</option><option value="GG">GG</option></select>';
             } else {
-                wrapper.innerHTML = '<input type="text" id="tamanho" placeholder="Ex: M, G, 42" required>';
+                wrapperTamanho.innerHTML = '<input type="text" id="tamanho" placeholder="Ex: M, G, 42" required>';
             }
         }
     }
@@ -179,17 +184,14 @@
     document.getElementById('loginCpf').addEventListener('input', e => {
         let v = e.target.value.replace(/\D/g, '');
         if (v.length > 11) v = v.slice(0, 11);
-        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
         e.target.value = v;
     });
 
     document.getElementById('loginNascimento').addEventListener('input', e => {
         let v = e.target.value.replace(/\D/g, '');
         if (v.length > 8) v = v.slice(0, 8);
-        v = v.replace(/(\d{2})(\d)/, '$1/$2');
-        v = v.replace(/(\d{2})(\d)/, '$1/$2');
+        v = v.replace(/(\d{2})(\d)/, '$1/$2'); v = v.replace(/(\d{2})(\d)/, '$1/$2');
         e.target.value = v;
     });
 
@@ -205,11 +207,7 @@
             const res = await fetch(`${API_URL}?cpf=${cpf}&nasc=${nascFormat}`);
             const json = await res.json();
             if(json.autenticado) {
-
-                nomeUsuarioGlobal = json.nome;
-                matriculaUsuarioGlobal = json.matricula;
-                cpfUsuarioGlobal = cpf;
-
+                nomeUsuarioGlobal = json.nome; matriculaUsuarioGlobal = json.matricula; cpfUsuarioGlobal = cpf;
                 document.getElementById('nome').value = json.nome;
                 document.getElementById('matricula').value = json.matricula;
                 document.getElementById('cpfValidado').value = cpf;
@@ -225,10 +223,9 @@
     async function atualizarE_AbrirHistorico() {
         abrirTela('telaHistorico');
         mostrarCarregando("Buscando registros...");
-        const cpf = cpfUsuarioGlobal;
-        const nasc = document.getElementById('loginNascimento').value.split('/');
         try {
-            const res = await fetch(`${API_URL}?cpf=${cpf}&nasc=${nasc[2]}-${nasc[1]}-${nasc[0]}`);
+            const nasc = document.getElementById('loginNascimento').value.split('/');
+            const res = await fetch(`${API_URL}?cpf=${cpfUsuarioGlobal}&nasc=${nasc[2]}-${nasc[1]}-${nasc[0]}`);
             const json = await res.json();
             historicoGeral = json.historico;
             renderizarHistorico();
@@ -239,26 +236,13 @@
     function renderizarHistorico() {
         const container = document.getElementById('containerHistorico');
         container.innerHTML = "";
-        if (historicoGeral.length === 0) {
-            container.innerHTML = "<p style='text-align:center; color:#666;'>Nenhum pedido encontrado.</p>";
-            return;
-        }
+        if (historicoGeral.length === 0) { container.innerHTML = "<p style='text-align:center; color:#666;'>Nenhum pedido encontrado.</p>"; return; }
         historicoGeral.forEach((p, index) => {
             const statusLower = p.status.toLowerCase();
-            const cor = statusLower.includes("aprovado") ? "status-aprovado" : 
-                        statusLower.includes("entregue") ? "status-entregue" : 
-                        statusLower.includes("recusado") ? "status-recusado" : "status-analise";
-            
+            const cor = statusLower.includes("aprovado") ? "status-aprovado" : statusLower.includes("entregue") ? "status-entregue" : statusLower.includes("recusado") ? "status-recusado" : "status-analise";
             const mostrarBotao = (statusLower.includes("análise") || statusLower.includes("aprovado"));
             let btnConfirmar = mostrarBotao ? `<button class="btn-confirmar" id="btn-conf-${index}" onclick="confirmarRecebimento('${p.protocolo}', ${index})">CONFIRMAR QUE RECEBI</button>` : "";
-            
-            container.innerHTML += `
-                <div class="card-historico" id="card-${index}">
-                    <div class="card-cabecalho"><span class="card-protocolo">PROT: ${p.protocolo}</span></div>
-                    <div class="card-item">${p.item}</div>
-                    <span class="tag-status ${cor}" id="status-tag-${index}">${p.status}</span>
-                    ${btnConfirmar}
-                </div>`;
+            container.innerHTML += `<div class="card-historico" id="card-${index}"><div class="card-cabecalho"><span class="card-protocolo">PROT: ${p.protocolo}</span></div><div class="card-item">${p.item}</div><span class="tag-status ${cor}" id="status-tag-${index}">${p.status}</span>${btnConfirmar}</div>`;
         });
     }
 
@@ -268,19 +252,13 @@
         const tag = document.getElementById(`status-tag-${index}`);
         if (btn) btn.style.display = 'none';
         if (tag) { tag.innerText = "ENTREGUE"; tag.className = "tag-status status-entregue"; }
-        try {
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: "confirmar_recebimento", protocolo: prot }) });
-        } catch (e) {
-            alert("Erro na rede. Caso não atualize, tente novamente.");
-            atualizarE_AbrirHistorico();
-        }
+        try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: "confirmar_recebimento", protocolo: prot }) }); } catch (e) { alert("Erro na rede. Caso não atualize, tente novamente."); atualizarE_AbrirHistorico(); }
     }
 
     document.getElementById('formUniforme').addEventListener('submit', async e => {
         e.preventDefault();
         const arquivo = document.getElementById('foto').files[0];
         if(!arquivo) { alert("Por favor, anexe a foto da peça."); return; }
-        
         mostrarCarregando("Compactando e enviando...");
         const reader = new FileReader();
         reader.onload = async event => {
@@ -288,33 +266,22 @@
             img.onload = async () => {
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 800;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * (MAX_WIDTH / img.width);
+                canvas.width = MAX_WIDTH; canvas.height = img.height * (MAX_WIDTH / img.width);
                 canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                 const payload = {
-                    nome: nomeUsuarioGlobal,
-                    matricula: matriculaUsuarioGlobal,
-                    cpf: cpfUsuarioGlobal,
-                    item: document.getElementById('item').value,
-                    tamanho: document.getElementById('tamanho').value,
-                    motivo: document.getElementById('motivo').value,
-                    arquivoNome: 'evidencia.jpg',
-                    arquivoMimeType: 'image/jpeg',
-                    arquivoBase64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1]
+                    nome: nomeUsuarioGlobal, matricula: matriculaUsuarioGlobal, cpf: cpfUsuarioGlobal,
+                    item: document.getElementById('item').value, tamanho: document.getElementById('tamanho').value,
+                    motivo: document.getElementById('motivo').value, arquivoNome: 'evidencia.jpg',
+                    arquivoMimeType: 'image/jpeg', arquivoBase64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1]
                 };
                 try {
                     await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                     alert("Solicitação enviada com sucesso!");
-                    
-
                     document.getElementById('formUniforme').reset();
-                    document.getElementById('secaoTamanho').style.display = 'none';
-                    
-
+                    document.getElementById('detalhesPedido').style.display = 'none'; // Reseta a visão completa
                     document.getElementById('nome').value = nomeUsuarioGlobal;
                     document.getElementById('matricula').value = matriculaUsuarioGlobal;
                     document.getElementById('cpfValidado').value = cpfUsuarioGlobal;
-                    
                     abrirTela('telaMenu');
                 } catch (e) { alert("Erro ao enviar pedido."); }
                 finally { ocultarCarregando(); }
