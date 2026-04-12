@@ -9,12 +9,16 @@
         .container { background-color: white; padding: 25px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); position: relative;}
         h2 { color: #0044cc; text-align: center; margin-top: 0; font-size: 22px;}
         label { display: block; margin-top: 18px; font-weight: 600; font-size: 14px; color: #444;}
-        input, select { width: 100%; padding: 14px; margin-top: 6px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;}
+        input, select { width: 100%; padding: 14px; margin-top: 6px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; text-transform: uppercase;}
         button { width: 100%; padding: 14px; background-color: #0044cc; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 25px; border-radius: 6px; font-size: 16px;}
         .btn-secundario { background-color: #e2e8f0; color: #475569; margin-top: 12px; }
         .btn-confirmar { background-color: #10b981; color: white; margin-top: 12px; padding: 12px; font-size: 14px; border-radius: 6px; border: none; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;}
         .btn-confirmar:disabled { background-color: #a5d6a7; cursor: not-allowed; }
         .btn-menu { min-height: 60px; font-size: 16px; margin-top: 15px; border: 2px solid #0044cc; background-color: white; color: #0044cc; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold;}
+        
+        #btnRemanejamento { border: 2px solid #10b981; color: #10b981; display: none; }
+        .alerta-clt { background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 12px; margin-top: 10px; border: 1px solid #fecaca; display: none; font-weight: bold; text-align: center; }
+
         .readonly { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed;}
         .tela { display: none; opacity: 0; transition: opacity 0.3s;}
         .tela-active { display: block; opacity: 1; }
@@ -36,7 +40,6 @@
         .rodape-seguranca { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.6;}
         .rodape-seguranca strong { color: #10b981; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; margin-bottom: 5px;}
 
-        /* Esconde os detalhes do pedido até que o item seja selecionado */
         #detalhesPedido { display: none; }
 
         #overlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(255,255,255,0.85); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
@@ -54,9 +57,9 @@
         <h2>Acesso do Colaborador</h2>
         <p style="text-align: center; color: #6b7280; font-size: 14px; margin-bottom: 20px;">Informe seus dados para entrar.</p>
         <label>CPF:</label>
-        <input type="tel" id="loginCpf" maxlength="14" placeholder="000.000.000-00">
+        <input type="tel" id="loginCpf" maxlength="14" placeholder="000.000.000-00" oninput="maskCPF(this)">
         <label>Data de Nascimento:</label>
-        <input type="tel" id="loginNascimento" maxlength="10" placeholder="DD/MM/AAAA">
+        <input type="tel" id="loginNascimento" maxlength="10" placeholder="DD/MM/AAAA" oninput="maskData(this)">
         <button onclick="autenticar()">Acessar Sistema</button>
         <div id="msgLogin"></div>
     </div>
@@ -64,9 +67,57 @@
     <div id="telaMenu" class="tela">
         <h2>Painel Principal</h2>
         <p style="text-align: center; margin-bottom: 25px;">Olá, <span id="displayNome" style="color: #0044cc; font-weight:bold;"></span>!</p>
-        <button class="btn-menu" onclick="abrirTela('telaFormulario')">👕 Nova Solicitação de Uniforme</button>
+        <button class="btn-menu" onclick="abrirTelaUniforme()">👕 Nova Solicitação de Uniforme</button>
+        <button id="btnRemanejamento" class="btn-menu" onclick="validarAcessoMovimentacao()">🔄 Movimentação de Posto</button>
         <button class="btn-menu" onclick="atualizarE_AbrirHistorico()">📋 Meus Pedidos e Status</button>
         <button class="btn-secundario" onclick="sair()" style="margin-top: 35px;">Sair com Segurança</button>
+    </div>
+
+    <div id="telaMovimentacao" class="tela">
+        <h2>Movimentação de Posto</h2>
+        <form id="formMov">
+            <label>Data de Execução:</label>
+            <input type="tel" id="movDataExec" maxlength="10" placeholder="DD/MM/AAAA" oninput="maskData(this)" onblur="validarDataSeteDias(this.value)" required>
+            <label>Nome do Colaborador (Pesquise):</label>
+            <input type="text" id="movNome" list="lNome" placeholder="Pesquise o nome..." oninput="autoColabNome(this.value)" required>
+            <datalist id="lNome"></datalist>
+            <label>Matrícula (Automático):</label>
+            <input type="text" id="movMat" class="readonly" readonly required>
+            <hr style="margin-top:20px; opacity: 0.2;">
+            <label>Nº Posto Origem (Atual):</label>
+            <input type="tel" id="movNumP_Origem" list="lNumP" placeholder="Nº Origem" oninput="autoPostoOrigem(this.value)" required>
+            <label>Nome Posto Origem:</label>
+            <input type="text" id="movNomeP_Origem" class="readonly" readonly required>
+            <label>Horário Posto Origem:</label>
+            <select id="movHoraOrigem" required>
+                <option value="">Selecione...</option>
+                <option value="06H00 ÀS 18H00">06H00 ÀS 18H00</option><option value="07H00 ÀS 19H00">07H00 ÀS 19H00</option>
+                <option value="09H00 ÀS 21H00">09H00 ÀS 21H00</option><option value="18H00 ÀS 06H00">18H00 ÀS 06H00</option>
+                <option value="19H00 ÀS 07H00">19H00 ÀS 07H00</option>
+            </select>
+            <hr style="margin-top:20px; opacity: 0.2;">
+            <label>Nº Posto Destino:</label>
+            <input type="tel" id="movNumP" list="lNumP" placeholder="Nº Destino" oninput="autoPosto(this.value)" required>
+            <datalist id="lNumP"></datalist>
+            <label>Nome Posto Destino:</label>
+            <input type="text" id="movNomeP" class="readonly" readonly required>
+            <label>Horário Posto Destino:</label>
+            <select id="movHoraDest" required onchange="checarCLT()">
+                <option value="">Selecione...</option>
+                <option value="06H00 ÀS 18H00">06H00 ÀS 18H00</option><option value="07H00 ÀS 19H00">07H00 ÀS 19H00</option>
+                <option value="09H00 ÀS 21H00">09H00 ÀS 21H00</option><option value="18H00 ÀS 06H00">18H00 ÀS 06H00</option>
+                <option value="19H00 ÀS 07H00">19H00 ÀS 07H00</option>
+            </select>
+            <label>Motivo da Movimentação:</label>
+            <input type="text" id="movMotivo" placeholder="Ex: REFORÇO..." required>
+            <div id="avisoCLT" class="alerta-clt">⚠️ NOTIFICAÇÃO: O colaborador deverá cumprir o repouso de 36h antes do novo horário.</div>
+            <div style="margin-top:15px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <input type="checkbox" id="movCiente" style="width:20px; height:20px;" required>
+                <label for="movCiente" style="margin:0; font-size:12px;">Ciente do descanso de 36h.</label>
+            </div>
+            <button type="submit" style="background:#10b981">Confirmar Registro</button>
+            <button type="button" class="btn-secundario" onclick="abrirTela('telaMenu')">Voltar</button>
+        </form>
     </div>
 
     <div id="telaHistorico" class="tela">
@@ -83,117 +134,87 @@
             <label>Matrícula:</label>
             <input type="text" id="matricula" class="readonly" readonly required>
             <input type="hidden" id="cpfValidado">
-            
             <label>Item:</label>
             <select id="item" required onchange="controlarCamposDinamicos(this.value)">
                 <option value="">Selecione...</option>
-                <option value="Boné">Boné</option>
-                <option value="Fiel">Fiel</option>
-                <option value="Apito">Apito</option>
-                <option value="Cinturão(preto)">Cinturão (Preto)</option>
-                <option value="Coldre">Coldre</option>
-                <option value="Cinta(azul)">Cinta (Azul)</option>
-                <option value="Jaqueta">Jaqueta</option>
-                <option value="Capa de Colete">Capa de Colete</option>
-                <option value="Camisa">Camisa</option>
-                <option value="Calça">Calça</option>
-                <option value="Coturno">Coturno</option>
+                <option value="Boné">Boné</option><option value="Fiel">Fiel</option><option value="Apito">Apito</option>
+                <option value="Cinturão(preto)">Cinturão (Preto)</option><option value="Coldre">Coldre</option>
+                <option value="Cinta(azul)">Cinta (Azul)</option><option value="Jaqueta">Jaqueta</option>
+                <option value="Capa de Colete">Capa de Colete</option><option value="Camisa">Camisa</option>
+                <option value="Calça">Calça</option><option value="Coturno">Coturno</option>
             </select>
-            
             <div id="detalhesPedido">
                 <div id="secaoTamanho">
                     <label>Tamanho / Numeração:</label>
-                    <div id="wrapperTamanho">
-                       <input type="text" id="tamanho" placeholder="Ex: M, G, 42">
-                    </div>
+                    <div id="wrapperTamanho"><input type="text" id="tamanho" placeholder="Ex: M, G, 42"></div>
                 </div>
-                
                 <label>Motivo da Troca:</label>
                 <input type="text" id="motivo" placeholder="Ex: Desgaste, rasgo, tamanho errado" required>
-                
                 <label>Foto da peça atual / Foto do defeito:</label>
                 <input type="file" id="foto" accept="image/*" capture="environment" required>
-                
-                <div class="caixa-aviso">
-                    <strong>Aviso da Gestão:</strong> O envio desta solicitação não garante a troca imediata. A substituição está sujeita a análise da condição do item e disponibilidade em estoque.
-                </div>
-
+                <div class="caixa-aviso"><strong>O envio desta solicitação não garante a troca imediata. A substituição está sujeita a análise da condição do item e disponibilidade em estoque.</strong></div>
                 <button type="submit">Enviar Solicitação</button>
             </div>
-
             <button type="button" class="btn-secundario" onclick="abrirTela('telaMenu')">Cancelar</button>
         </form>
     </div>
 
     <div class="rodape-seguranca">
-        <strong>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            Ambiente Seguro e Monitorado
-        </strong>
-        Conexão criptografada ponta a ponta.
+        <strong><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Ambiente Seguro e Monitorado</strong>
+        <br>Conexão criptografada ponta a ponta.
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzb6ubyTJrb4BT5bvWv20NtT_R7P_VSXOOztTVYagRiKoKGCghZ8pmqXIgFzDaqiv61Ew/exec";
+    let userData = {}, historicoGeral = [], cpfUsuarioGlobal = "", nomeUsuarioGlobal = "", matriculaUsuarioGlobal = "";
+
+    // MÁSCARAS INTELIGENTES (RESOLVIDO: PERMITE APAGAR)
+    let lastKey = "";
+    document.addEventListener('keydown', e => { lastKey = e.key; });
+
+    function maskCPF(i) {
+        if (lastKey === "Backspace") return;
+        let v = i.value.replace(/\D/g, '');
+        if (v.length >= 3) v = v.substring(0,3) + '.' + v.substring(3);
+        if (v.length >= 7) v = v.substring(0,7) + '.' + v.substring(7);
+        if (v.length >= 11) v = v.substring(0,11) + '-' + v.substring(11);
+        i.value = v.substring(0, 14);
+    }
+
+    function maskData(i) {
+        if (lastKey === "Backspace") return;
+        let v = i.value.replace(/\D/g, '');
+        if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
+        if (v.length >= 5) v = v.substring(0,5) + '/' + v.substring(5);
+        i.value = v.substring(0, 10);
+    }
 
     window.addEventListener('contextmenu', e => e.preventDefault());
     function mostrarCarregando(t) { document.getElementById('loaderTexto').innerText = t; document.getElementById('overlay').style.display = 'flex'; }
     function ocultarCarregando() { document.getElementById('overlay').style.display = 'none'; }
-    
-    let historicoGeral = [];
-    let nomeUsuarioGlobal = "";
-    let matriculaUsuarioGlobal = "";
-    let cpfUsuarioGlobal = "";
+    function abrirTela(id) { document.querySelectorAll('.tela').forEach(t => t.classList.remove('tela-active')); document.getElementById(id).classList.add('tela-active'); window.scrollTo(0, 0); }
+    function sair() { document.getElementById('loginCpf').value = ""; document.getElementById('loginNascimento').value = ""; nomeUsuarioGlobal = ""; matriculaUsuarioGlobal = ""; cpfUsuarioGlobal = ""; abrirTela('telaLogin'); }
 
-    function abrirTela(id) {
-        document.querySelectorAll('.tela').forEach(t => t.classList.remove('tela-active'));
-        document.getElementById(id).classList.add('tela-active');
-        window.scrollTo(0, 0);
+    function abrirTelaUniforme() {
+        document.getElementById('formUniforme').reset();
+        document.getElementById('nome').value = nomeUsuarioGlobal;
+        document.getElementById('matricula').value = matriculaUsuarioGlobal;
+        document.getElementById('detalhesPedido').style.display = 'none';
+        abrirTela('telaFormulario');
     }
-
-    function sair() {
-        document.getElementById('loginCpf').value = "";
-        document.getElementById('loginNascimento').value = "";
-        nomeUsuarioGlobal = ""; matriculaUsuarioGlobal = ""; cpfUsuarioGlobal = "";
-        abrirTela('telaLogin');
-    }
-
 
     function controlarCamposDinamicos(val) {
         const detalhes = document.getElementById('detalhesPedido');
         const wrapperTamanho = document.getElementById('wrapperTamanho');
         const itensUnico = ["Boné", "Fiel", "Apito", "Cinturão(preto)", "Coldre", "Cinta(azul)"];
-        
-        if (!val) {
-            detalhes.style.display = 'none'; 
-        } else {
-            detalhes.style.display = 'block'; 
-            
-
-            if (itensUnico.includes(val)) {
-                wrapperTamanho.innerHTML = '<input type="text" id="tamanho" value="UNICO" class="readonly" readonly required>';
-            } else if (val === "Capa de Colete") {
-                wrapperTamanho.innerHTML = '<select id="tamanho" required><option value="">Selecione...</option><option value="G">G</option><option value="GG">GG</option></select>';
-            } else {
-                wrapperTamanho.innerHTML = '<input type="text" id="tamanho" placeholder="Ex: M, G, 42" required>';
-            }
+        if (!val || val === "") { detalhes.style.display = 'none'; } else {
+            detalhes.style.display = 'block';
+            if (itensUnico.includes(val)) { wrapperTamanho.innerHTML = '<input type="text" id="tamanho" value="UNICO" class="readonly" readonly required>'; } 
+            else if (val === "Capa de Colete") { wrapperTamanho.innerHTML = '<select id="tamanho" required><option value="">Selecione...</option><option value="G">G</option><option value="GG">GG</option></select>'; } 
+            else { wrapperTamanho.innerHTML = '<input type="text" id="tamanho" placeholder="Ex: M, G, 42" required>'; }
         }
     }
-
-    document.getElementById('loginCpf').addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '');
-        if (v.length > 11) v = v.slice(0, 11);
-        v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        e.target.value = v;
-    });
-
-    document.getElementById('loginNascimento').addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '');
-        if (v.length > 8) v = v.slice(0, 8);
-        v = v.replace(/(\d{2})(\d)/, '$1/$2'); v = v.replace(/(\d{2})(\d)/, '$1/$2');
-        e.target.value = v;
-    });
 
     async function autenticar() {
         const cpf = document.getElementById('loginCpf').value;
@@ -202,93 +223,86 @@
         if(!cpf || nasc.length < 10) { msg.innerText = "Preencha CPF e Data corretamente."; return; }
         mostrarCarregando("Autenticando...");
         const d = nasc.split('/');
-        const nascFormat = `${d[2]}-${d[1]}-${d[0]}`;
         try {
-            const res = await fetch(`${API_URL}?cpf=${cpf}&nasc=${nascFormat}`);
-            const json = await res.json();
-            if(json.autenticado) {
-                nomeUsuarioGlobal = json.nome; matriculaUsuarioGlobal = json.matricula; cpfUsuarioGlobal = cpf;
-                document.getElementById('nome').value = json.nome;
-                document.getElementById('matricula').value = json.matricula;
-                document.getElementById('cpfValidado').value = cpf;
-                document.getElementById('displayNome').innerText = json.nome.split(" ")[0];
-                historicoGeral = json.historico;
-                msg.innerText = "";
-                abrirTela('telaMenu');
-            } else { msg.innerText = "Dados não encontrados."; }
-        } catch (e) { msg.innerText = "Erro de conexão."; }
-        finally { ocultarCarregando(); }
+            const res = await fetch(`${API_URL}?cpf=${cpf}&nasc=${d[2]}-${d[1]}-${d[0]}`);
+            userData = await res.json();
+            if(userData.autenticado) {
+                cpfUsuarioGlobal = cpf; nomeUsuarioGlobal = userData.nome.toUpperCase(); matriculaUsuarioGlobal = userData.matricula;
+                document.getElementById('nome').value = nomeUsuarioGlobal;
+                document.getElementById('matricula').value = matriculaUsuarioGlobal;
+                document.getElementById('displayNome').innerText = userData.nome.split(" ")[0].toUpperCase();
+                document.getElementById('btnRemanejamento').style.display = userData.acessoEspecial ? 'flex' : 'none';
+                if(userData.acessoEspecial) carregarDatalists();
+                msg.innerText = ""; abrirTela('telaMenu');
+            } else { msg.innerText = "Informações Incorreta / Dados não encontrado."; }
+        } catch(e) { msg.innerText = "Erro de conexão."; } finally { ocultarCarregando(); }
     }
+
+    function carregarDatalists() {
+        const dlNome = document.getElementById('lNome'), dlNumP = document.getElementById('lNumP');
+        dlNome.innerHTML = ""; dlNumP.innerHTML = "";
+        userData.colaboradores.forEach(c => { dlNome.innerHTML += `<option value="${c.nome.toUpperCase()}">`; });
+        userData.postos.forEach(p => { dlNumP.innerHTML += `<option value="${p.id}">`; });
+    }
+    function autoColabNome(v) { const achado = userData.colaboradores.find(c => c.nome.toUpperCase() === v.toUpperCase()); document.getElementById('movMat').value = achado ? achado.mat : ""; }
+    function autoPosto(v) { const achado = userData.postos.find(p => p.id === v); document.getElementById('movNomeP').value = achado ? achado.nome.toUpperCase() : ""; }
+    function autoPostoOrigem(v) { const achado = userData.postos.find(p => p.id === v); document.getElementById('movNomeP_Origem').value = achado ? achado.nome.toUpperCase() : ""; }
+    function validarDataSeteDias(val) { if(val.length < 10) return; const partes = val.split('/'); const escolhida = new Date(partes[2], partes[1] - 1, partes[0]); const hoje = new Date(); hoje.setHours(0,0,0,0); const diff = (escolhida - hoje) / (1000*60*60*24); if(diff < 7) { alert("A comunicação deve ocorrer com minimo 7 dias antes"); document.getElementById('movDataExec').value = ""; } }
+    function checarCLT() { document.getElementById('avisoCLT').style.display = 'block'; }
+    function validarAcessoMovimentacao() { const p = prompt("Digite sua PALAVRA-PASSE:"); if(p === userData.tokenSeguranca) { abrirTela('telaMovimentacao'); } else { alert("Incorreta"); } }
 
     async function atualizarE_AbrirHistorico() {
-        abrirTela('telaHistorico');
-        mostrarCarregando("Buscando registros...");
+        abrirTela('telaHistorico'); mostrarCarregando("Buscando...");
+        const d = document.getElementById('loginNascimento').value.split('/');
         try {
-            const nasc = document.getElementById('loginNascimento').value.split('/');
-            const res = await fetch(`${API_URL}?cpf=${cpfUsuarioGlobal}&nasc=${nasc[2]}-${nasc[1]}-${nasc[0]}`);
-            const json = await res.json();
-            historicoGeral = json.historico;
-            renderizarHistorico();
-        } catch (e) { alert("Erro ao atualizar histórico."); }
-        finally { ocultarCarregando(); }
+            const res = await fetch(`${API_URL}?cpf=${cpfUsuarioGlobal}&nasc=${d[2]}-${d[1]}-${d[0]}`);
+            const json = await res.json(); historicoGeral = json.historico; renderizarHistorico();
+        } catch (e) { alert("Erro histórico."); } finally { ocultarCarregando(); }
     }
-
     function renderizarHistorico() {
-        const container = document.getElementById('containerHistorico');
-        container.innerHTML = "";
-        if (historicoGeral.length === 0) { container.innerHTML = "<p style='text-align:center; color:#666;'>Nenhum pedido encontrado.</p>"; return; }
-        historicoGeral.forEach((p, index) => {
+        const container = document.getElementById('containerHistorico'); container.innerHTML = "";
+        if (historicoGeral.length === 0) { container.innerHTML = "<p style='text-align:center;'>Nenhum pedido encontrado.</p>"; return; }
+        historicoGeral.forEach((p) => {
             const statusLower = p.status.toLowerCase();
             const cor = statusLower.includes("aprovado") ? "status-aprovado" : statusLower.includes("entregue") ? "status-entregue" : statusLower.includes("recusado") ? "status-recusado" : "status-analise";
-            const mostrarBotao = (statusLower.includes("análise") || statusLower.includes("aprovado"));
-            let btnConfirmar = mostrarBotao ? `<button class="btn-confirmar" id="btn-conf-${index}" onclick="confirmarRecebimento('${p.protocolo}', ${index})">CONFIRMAR QUE RECEBI</button>` : "";
-            container.innerHTML += `<div class="card-historico" id="card-${index}"><div class="card-cabecalho"><span class="card-protocolo">PROT: ${p.protocolo}</span></div><div class="card-item">${p.item}</div><span class="tag-status ${cor}" id="status-tag-${index}">${p.status}</span>${btnConfirmar}</div>`;
+            let btnConfirmar = (statusLower.includes("análise") || statusLower.includes("aprovado")) ? `<button class="btn-confirmar" onclick="confirmarRecebimento('${p.protocolo}')">CONFIRMAR QUE RECEBI</button>` : "";
+            container.innerHTML += `<div class="card-historico"><div class="card-cabecalho"><span class="card-protocolo">PROT: ${p.protocolo}</span></div><div class="card-item">${p.item}</div><span class="tag-status ${cor}">${p.status}</span>${btnConfirmar}</div>`;
         });
     }
+    async function confirmarRecebimento(prot) { if(!confirm("Confirma que recebeu o material em mãos?")) return; mostrarCarregando("Confirmando..."); try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: "confirmar_recebimento", protocolo: prot }) }); atualizarE_AbrirHistorico(); } catch (e) { alert("Erro."); ocultarCarregando(); } }
 
-    async function confirmarRecebimento(prot, index) {
-        if(!confirm("Você confirma que recebeu este item em mãos?")) return;
-        const btn = document.getElementById(`btn-conf-${index}`);
-        const tag = document.getElementById(`status-tag-${index}`);
-        if (btn) btn.style.display = 'none';
-        if (tag) { tag.innerText = "ENTREGUE"; tag.className = "tag-status status-entregue"; }
-        try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: "confirmar_recebimento", protocolo: prot }) }); } catch (e) { alert("Erro na rede. Caso não atualize, tente novamente."); atualizarE_AbrirHistorico(); }
-    }
+    document.getElementById('formMov').onsubmit = async (e) => {
+        e.preventDefault(); mostrarCarregando("Gravando...");
+        const payload = {
+            acao: "movimentacao_posto", supervisor: nomeUsuarioGlobal, dataExecucao: document.getElementById('movDataExec').value,
+            matColab: document.getElementById('movMat').value, nomeColab: document.getElementById('movNome').value.toUpperCase(),
+            postoOrigem: `[${document.getElementById('movNumP_Origem').value}] ${document.getElementById('movNomeP_Origem').value.toUpperCase()}`,
+            horaOrigem: document.getElementById('movHoraOrigem').value,
+            postoDestino: `[${document.getElementById('movNumP').value}] ${document.getElementById('movNomeP').value.toUpperCase()}`,
+            horaDestino: document.getElementById('movHoraDest').value,
+            motivo: document.getElementById('movMotivo').value.toUpperCase(), cienteFolga: document.getElementById('movCiente').checked
+        };
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        alert("✅ Registrado!"); document.getElementById('formMov').reset(); document.getElementById('avisoCLT').style.display = 'none'; ocultarCarregando();
+    };
 
     document.getElementById('formUniforme').addEventListener('submit', async e => {
-        e.preventDefault();
-        const arquivo = document.getElementById('foto').files[0];
-        if(!arquivo) { alert("Por favor, anexe a foto da peça."); return; }
+        e.preventDefault(); const arquivo = document.getElementById('foto').files[0]; if(!arquivo) { alert("Anexe a foto."); return; }
         mostrarCarregando("Compactando e enviando...");
-        const reader = new FileReader();
-        reader.onload = async event => {
-            const img = new Image();
-            img.onload = async () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                canvas.width = MAX_WIDTH; canvas.height = img.height * (MAX_WIDTH / img.width);
+        const reader = new FileReader(); reader.onload = async event => {
+            const img = new Image(); img.onload = async () => {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; canvas.width = MAX_WIDTH; canvas.height = img.height * (MAX_WIDTH / img.width);
                 canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                 const payload = {
                     nome: nomeUsuarioGlobal, matricula: matriculaUsuarioGlobal, cpf: cpfUsuarioGlobal,
                     item: document.getElementById('item').value, tamanho: document.getElementById('tamanho').value,
-                    motivo: document.getElementById('motivo').value, arquivoNome: 'evidencia.jpg',
+                    motivo: document.getElementById('motivo').value.toUpperCase(), arquivoNome: 'evidencia.jpg',
                     arquivoMimeType: 'image/jpeg', arquivoBase64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1]
                 };
-                try {
-                    await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    alert("Solicitação enviada com sucesso!");
-                    document.getElementById('formUniforme').reset();
-                    document.getElementById('detalhesPedido').style.display = 'none'; // Reseta a visão completa
-                    document.getElementById('nome').value = nomeUsuarioGlobal;
-                    document.getElementById('matricula').value = matriculaUsuarioGlobal;
-                    document.getElementById('cpfValidado').value = cpfUsuarioGlobal;
-                    abrirTela('telaMenu');
-                } catch (e) { alert("Erro ao enviar pedido."); }
-                finally { ocultarCarregando(); }
-            };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(arquivo);
+                try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); alert("✅ Enviado! Acompanhe o status."); abrirTela('telaMenu'); } 
+                catch (e) { alert("Erro ao enviar."); } finally { ocultarCarregando(); }
+            }; img.src = event.target.result;
+        }; reader.readAsDataURL(arquivo);
     });
 </script>
 </body>
