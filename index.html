@@ -46,6 +46,10 @@
         .dots-loader { display: flex; gap: 8px; }
         .dots-loader div { width: 15px; height: 15px; background-color: #0044cc; border-radius: 50%; animation: pulse 0.6s infinite alternate; }
         @keyframes pulse { to { transform: scale(1.5); opacity: 0.3; } }
+		
+		#btnFaltas { border: 2px solid #f59e0b; color: #f59e0b; display: none; }
+		
+		
     </style>
 </head>
 <body>
@@ -69,6 +73,7 @@
         <p style="text-align: center; margin-bottom: 25px;">Olá, <span id="displayNome" style="color: #0044cc; font-weight:bold;"></span>!</p>
         <button class="btn-menu" onclick="abrirTelaUniforme()">👕 Nova Solicitação de Uniforme</button>
         <button id="btnRemanejamento" class="btn-menu" onclick="validarAcessoMovimentacao()">🔄 Movimentação de Posto</button>
+		<button id="btnFaltas" class="btn-menu" onclick="validarAcessoFaltas()">📋 Faltas e Atestados</button>
         <button class="btn-menu" onclick="atualizarE_AbrirHistorico()">📋 Meus Pedidos e Status</button>
         <button class="btn-secundario" onclick="sair()" style="margin-top: 35px;">Sair com Segurança</button>
     </div>
@@ -169,7 +174,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzb6ubyTJrb4BT5bvWv20NtT_R7P_VSXOOztTVYagRiKoKGCghZ8pmqXIgFzDaqiv61Ew/exec";
     let userData = {}, historicoGeral = [], cpfUsuarioGlobal = "", nomeUsuarioGlobal = "", matriculaUsuarioGlobal = "";
 
-
+    // MÁSCARAS INTELIGENTES (RESOLVIDO: PERMITE APAGAR)
     let lastKey = "";
     document.addEventListener('keydown', e => { lastKey = e.key; });
 
@@ -195,7 +200,10 @@
     function ocultarCarregando() { document.getElementById('overlay').style.display = 'none'; }
     function abrirTela(id) { document.querySelectorAll('.tela').forEach(t => t.classList.remove('tela-active')); document.getElementById(id).classList.add('tela-active'); window.scrollTo(0, 0); }
     function sair() { document.getElementById('loginCpf').value = ""; document.getElementById('loginNascimento').value = ""; nomeUsuarioGlobal = ""; matriculaUsuarioGlobal = ""; cpfUsuarioGlobal = ""; abrirTela('telaLogin'); }
-
+	function sair() { 
+        localStorage.clear();
+        location.reload(); 
+    }
     function abrirTelaUniforme() {
         document.getElementById('formUniforme').reset();
         document.getElementById('nome').value = nomeUsuarioGlobal;
@@ -216,28 +224,63 @@
         }
     }
 
-    async function autenticar() {
-        const cpf = document.getElementById('loginCpf').value;
-        const nasc = document.getElementById('loginNascimento').value;
+   async function autenticar() {
+        const cpfInput = document.getElementById('loginCpf').value;
+        const nascInput = document.getElementById('loginNascimento').value;
         const msg = document.getElementById('msgLogin');
-        if(!cpf || nasc.length < 10) { msg.innerText = "Preencha CPF e Data corretamente."; return; }
+        
+        if(!cpfInput || nascInput.length < 10) { 
+            msg.innerText = "Preencha CPF e Data corretamente."; 
+            return; 
+        }
+        
         mostrarCarregando("Autenticando...");
-        const d = nasc.split('/');
+        
         try {
-            const res = await fetch(`${API_URL}?cpf=${cpf}&nasc=${d[2]}-${d[1]}-${d[0]}`);
-            userData = await res.json();
-            if(userData.autenticado) {
-                cpfUsuarioGlobal = cpf; nomeUsuarioGlobal = userData.nome.toUpperCase(); matriculaUsuarioGlobal = userData.matricula;
+            const d = nascInput.split('/');
+            const dataFormatada = d[2] + "-" + d[1] + "-" + d[0];
+            const urlFinal = API_URL + "?cpf=" + cpfInput + "&nasc=" + dataFormatada;
+            
+            // O segredo para não travar é o redirect: 'follow'
+            const response = await fetch(urlFinal, {
+                method: 'GET',
+                mode: 'cors',
+                redirect: 'follow'
+            });
+
+            const data = await response.json();
+            userData = data; // Armazena os dados recebidos
+
+            if(data.autenticado) {
+                cpfUsuarioGlobal = cpfInput; 
+                nomeUsuarioGlobal = data.nome.toUpperCase(); 
+                matriculaUsuarioGlobal = data.matricula;
+                
                 document.getElementById('nome').value = nomeUsuarioGlobal;
                 document.getElementById('matricula').value = matriculaUsuarioGlobal;
-                document.getElementById('displayNome').innerText = userData.nome.split(" ")[0].toUpperCase();
-                document.getElementById('btnRemanejamento').style.display = userData.acessoEspecial ? 'flex' : 'none';
-                if(userData.acessoEspecial) carregarDatalists();
-                msg.innerText = ""; abrirTela('telaMenu');
-            } else { msg.innerText = "Informações Incorreta / Dados não encontrado."; }
-        } catch(e) { msg.innerText = "Erro de conexão."; } finally { ocultarCarregando(); }
+                document.getElementById('displayNome').innerText = data.nome.split(" ")[0].toUpperCase();
+                
+                // Exibe botões de supervisor se for o caso
+                document.getElementById('btnRemanejamento').style.display = data.acessoEspecial ? 'flex' : 'none';
+                document.getElementById('btnFaltas').style.display = data.acessoEspecial ? 'flex' : 'none';
+                
+                localStorage.setItem('veper_user', JSON.stringify(data));
+                localStorage.setItem('veper_cpf', cpfInput);
+                
+                if(data.acessoEspecial) carregarDatalists();
+                
+                msg.innerText = ""; 
+                abrirTela('telaMenu');
+            } else { 
+                msg.innerText = "Dados incorretos ou não cadastrados."; 
+            }
+        } catch(error) { 
+            console.error("Erro no Login:", error);
+            msg.innerText = "Erro de conexão com o servidor."; 
+        } finally { 
+            ocultarCarregando(); 
+        }
     }
-
     function carregarDatalists() {
         const dlNome = document.getElementById('lNome'), dlNumP = document.getElementById('lNumP');
         dlNome.innerHTML = ""; dlNumP.innerHTML = "";
@@ -251,14 +294,39 @@
     function checarCLT() { document.getElementById('avisoCLT').style.display = 'block'; }
     function validarAcessoMovimentacao() { const p = prompt("Digite sua PALAVRA-PASSE:"); if(p === userData.tokenSeguranca) { abrirTela('telaMovimentacao'); } else { alert("Incorreta"); } }
 
-    async function atualizarE_AbrirHistorico() {
-        abrirTela('telaHistorico'); mostrarCarregando("Buscando...");
-        const d = document.getElementById('loginNascimento').value.split('/');
-        try {
-            const res = await fetch(`${API_URL}?cpf=${cpfUsuarioGlobal}&nasc=${d[2]}-${d[1]}-${d[0]}`);
-            const json = await res.json(); historicoGeral = json.historico; renderizarHistorico();
-        } catch (e) { alert("Erro histórico."); } finally { ocultarCarregando(); }
+async function atualizarE_AbrirHistorico() {
+    abrirTela('telaHistorico');
+    
+    // 1. Tenta usar o histórico que já veio no login (mais rápido)
+    if (userData && userData.historico) {
+        historicoGeral = userData.historico;
+        renderizarHistorico();
     }
+
+    mostrarCarregando("Buscando histórico...");
+    
+    // 2. Busca atualização do servidor enviando CPF e Nascimento (formato que o script de Uniformes aceita)
+    const d = document.getElementById('loginNascimento').value.split('/');
+    const dataFormatada = d[2] + "-" + d[1] + "-" + d[0];
+    
+    try {
+        // Chamada padrão que o seu script de uniformes já entende
+        const res = await fetch(`${API_URL}?cpf=${cpfUsuarioGlobal}&nasc=${dataFormatada}`, {
+            redirect: 'follow'
+        });
+        const json = await res.json();
+        
+        if (json.autenticado && json.historico) {
+            historicoGeral = json.historico;
+            renderizarHistorico();
+        }
+    } catch (e) { 
+        console.error("Erro histórico:", e);
+        alert("Não foi possível atualizar o histórico agora."); 
+    } finally { 
+        ocultarCarregando(); 
+    }
+}
     function renderizarHistorico() {
         const container = document.getElementById('containerHistorico'); container.innerHTML = "";
         if (historicoGeral.length === 0) { container.innerHTML = "<p style='text-align:center;'>Nenhum pedido encontrado.</p>"; return; }
@@ -304,6 +372,21 @@
             }; img.src = event.target.result;
         }; reader.readAsDataURL(arquivo);
     });
+	
+
+function validarAcessoFaltas() {
+
+    const p = prompt("Digite sua PALAVRA-PASSE para Faltas e Atestados:");
+    
+    if(p === userData.tokenSeguranca) { 
+
+        window.location.href = 'faltaseatestados.html'; 
+    } else { 
+
+        alert("Palavra-passe incorreta."); 
+    }
+}
+	
 </script>
 </body>
 </html>
