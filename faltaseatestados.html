@@ -556,27 +556,23 @@ async function carregarCalendario() {
                 tdDia.className = 'celula-dia';
                 
                 let registro = escala[mat].dias.find(item => item.dia === d);
-                if (registro) {
-                    // Estrutura para Posto e Horário
-                    let htmlInterno = `<span>${registro.posto}</span>`;
-                    
-                    // Só adiciona se o campo 'horario' existir nos dados vindos do .gs
-                    if (registro.horario) {
-                        htmlInterno += `<span class="hora-escala">${registro.horario}</span>`;
-                    }
-                    
-                    tdDia.innerHTML = htmlInterno;
-                    tdDia.classList.add('dia-trabalhado');
-                }
-                row.appendChild(tdDia);
-            }
-            corpo.appendChild(row);
-        }
-    } catch (e) {
-        console.error("Erro ao carregar o calendário:", e);
-    }
-}
+                // Procure a parte que monta o htmlInterno e use assim:
+if (registro) {
+    let postoExibicao = registro.posto;
+    // Se o posto for longo (ex: EPR-SMI), vamos diminuir ainda mais a fonte dele
+    let estiloPosto = postoExibicao.length > 3 ? 'style="font-size: 7px;"' : '';
 
+    let htmlInterno = `<span ${estiloPosto}>${postoExibicao}</span>`;
+    
+    if (registro.horario) {
+        // Encurta 06:00-18:00 para 06-18
+        let horaCurta = registro.horario.replace(/:00/g, '');
+        htmlInterno += `<span class="hora-escala">${horaCurta}</span>`;
+    }
+    
+    tdDia.innerHTML = htmlInterno;
+    tdDia.classList.add('dia-trabalhado');
+}
 
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwXCAIp77nB9wVVBm8me9fqoLNHrY2vZi5UCwrrqrNaANANrEzDWRro4YIvCIfvfY3F/exec";
