@@ -513,13 +513,12 @@ async function carregarCalendario() {
         const mes = hoje.getMonth();
         const ultimoDia = new Date(ano, mes + 1, 0).getDate();
 
+        // 1. Monta o cabeçalho apenas uma vez
         if (cabecalho.cells.length <= 1) {
             for (let d = 1; d <= ultimoDia; d++) {
                 let th = document.createElement('th');
                 th.innerText = d;
                 th.className = 'celula-dia';
-                
-                // Identifica se o dia é Sábado (6) ou Domingo (0)
                 let dataVerif = new Date(ano, mes, d);
                 if (dataVerif.getDay() === 0 || dataVerif.getDay() === 6) {
                     th.classList.add('dia-destaque-vermelho');
@@ -532,41 +531,37 @@ async function carregarCalendario() {
             cabecalho.appendChild(thT);
         }
 
-corpo.innerHTML = "";
+        corpo.innerHTML = "";
         
-        // Mudança para forEach para garantir a ordem vinda do servidor
+        // 2. CORREÇÃO CRÍTICA: Usar .forEach porque 'escala' agora é uma Lista (Array)
         escala.forEach(item => {
             let row = document.createElement('tr');
             let tdNome = document.createElement('td');
             tdNome.innerText = item.nome;
             tdNome.style.textAlign = "left";
-            tdNome.style.paddingLeft = "15px"; // Ajuste para alinhar com o cabeçalho
+            tdNome.style.paddingLeft = "15px";
             row.appendChild(tdNome);
 
             for (let d = 1; d <= ultimoDia; d++) {
                 let tdDia = document.createElement('td');
                 tdDia.className = 'celula-dia';
                 
-                // Aplica vermelho se for final de semana (0=Dom, 6=Sáb)
-                let dataVerif = new Date(hoje.getFullYear(), hoje.getMonth(), d);
-                let diaSemana = dataVerif.getDay();
-                if (diaSemana === 0 || diaSemana === 6) {
-                    tdDia.style.color = "#ef4444";
-                    tdDia.style.fontWeight = "900";
+                let dataVerif = new Date(ano, mes, d);
+                if (dataVerif.getDay() === 0 || dataVerif.getDay() === 6) {
+                    tdDia.classList.add('dia-destaque-vermelho');
                 }
 
-                // Busca o plantão do dia
+                // Busca o plantão do dia d
                 let registro = item.dias.find(p => p.dia === d);
                 if (registro) {
                     tdDia.innerText = registro.posto;
                     tdDia.classList.add('dia-trabalhado');
-                    // Balão com detalhes
                     tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario || '---'}\n👤 Colaborador: ${item.nome}`;
                 }
                 row.appendChild(tdDia);
             }
 
-            // Coluna de Total Verde
+            // Coluna de Total (Verde)
             let tdTotal = document.createElement('td');
             tdTotal.className = 'celula-dia coluna-total';
             tdTotal.innerText = item.total;
