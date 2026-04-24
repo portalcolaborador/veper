@@ -214,6 +214,36 @@
 <datalist id="lPostos"></datalist>
 
 <script>
+
+    // Adicione isto dentro da sua tag <script> no HTML
+document.getElementById('nomeCobertura').addEventListener('blur', async function() {
+    const nome = this.value.toUpperCase().trim();
+    const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === nome);
+    
+    if (achado) {
+        document.getElementById('matCobertura').value = achado.mat;
+        
+        // Dispara a verificação no Servidor (GS)
+        const data = document.getElementById('dataPlantao').value;
+        const hora = document.getElementById('horaEnt').value;
+        
+        const response = await fetch(`${API_URL}?acao=check_compliance&mat=${achado.mat}&data=${data}&hora=${hora}`);
+        const status = await response.json();
+        
+        // Atualiza os cards visuais no site
+        const cardRec = document.getElementById('cardReciclagem');
+        const cardFolga = document.getElementById('cardFolga');
+        
+        cardRec.style.display = 'flex';
+        cardRec.innerText = `RECICLAGEM: ${status.reciclagem.mensagem}`;
+        cardRec.className = `status-box ${status.reciclagem.ok ? 'bg-ok' : 'bg-error'}`;
+        
+        cardFolga.style.display = 'flex';
+        cardFolga.innerText = `FOLGA 36H: ${status.folga36h.mensagem}`;
+        cardFolga.className = `status-box ${status.folga36h.ok ? 'bg-ok' : 'bg-error'}`;
+    }
+});
+    
     const API_URL = "https://script.google.com/macros/s/AKfycbwXCAIp77nB9wVVBm8me9fqoLNHrY2vZi5UCwrrqrNaANANrEzDWRro4YIvCIfvfY3F/exec";
     let userLogado = JSON.parse(localStorage.getItem('veper_user'));
     let lastKey = "";
