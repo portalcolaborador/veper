@@ -648,47 +648,42 @@ async function carregarCalendario() {
 
     }
 
-
-
-    // Carregar Historico Realtime
-
+    // Carregar Historico Realtime - Ordenado pelo mais recente
     async function carregarHistoricoRealtime() {
-
         try {
-
             const response = await fetch(`${API_URL}?acao=get_historico`);
-
             const dados = await response.json();
-
             const corpo = document.getElementById('corpoTabela');
-
             corpo.innerHTML = ""; 
 
-
-
-            dados.forEach(item => {
-
-                corpo.innerHTML += `
-
-                    <tr style="border-bottom: 1px solid var(--border);">
-
-                        <td style="padding: 12px;">${item.data}</td>
-
-                        <td style="padding: 12px;">${item.nome}</td>
-
-                        <td style="padding: 12px;">${item.posto}</td>
-
-                        <td style="padding: 12px;">${item.motivo}</td>
-
-                        <td style="padding: 12px;">${item.entrada || "-"}</td>
-
-                        <td style="padding: 12px;">${item.saida || "-"}</td>
-
-                        <td style="padding: 12px;">${item.intermitente || "-"}</td>
-
-                    </tr>`;
-
+            // 1. Lógica de Ordenação
+            dados.sort((a, b) => {
+                // Função auxiliar para converter "dd/MM/yyyy" em objeto Date comparável
+                const parseData = (dataStr) => {
+                    const [dia, mes, ano] = dataStr.split('/');
+                    return new Date(ano, mes - 1, dia);
+                };
+                // Ordem decrescente: b - a coloca o mais novo no topo
+                return parseData(b.data) - parseData(a.data);
             });
+
+            // 2. Renderização da Tabela
+            dados.forEach(item => {
+                corpo.innerHTML += `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 12px;">${item.data}</td>
+                        <td style="padding: 12px;">${item.nome}</td>
+                        <td style="padding: 12px;">${item.posto}</td>
+                        <td style="padding: 12px;">${item.motivo}</td>
+                        <td style="padding: 12px;">${item.entrada || "-"}</td>
+                        <td style="padding: 12px;">${item.saida || "-"}</td>
+                        <td style="padding: 12px;">${item.intermitente || "-"}</td>
+                    </tr>`;
+            });
+        } catch (e) {
+            console.log("Erro ao carregar histórico.");
+        }
+    }
 
         } catch (e) {
 
