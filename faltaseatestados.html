@@ -728,20 +728,24 @@ carregarCalendario();
     });
 
 
+//alterado às 11:34
+document.getElementById('numPosto').addEventListener('blur', function() {
+    let val = this.value.trim().toUpperCase(); // Pega o que foi digitado em letras maiúsculas
+    if (!val) return;
 
-    document.getElementById('numPosto').addEventListener('blur', function() {
+    // Busca na lista de postos do usuário logado
+    // O .toString() garante que a comparação funcione tanto para números quanto para textos
+    const achado = userLogado.postos.find(p => p.id.toString().toUpperCase() === val);
 
-        let val = this.value.trim(); if (!val) return;
-
-        const idLimpo = parseInt(val, 10).toString();
-
-        const achado = userLogado.postos.find(p => p.id.toString() === idLimpo);
-
-        if (achado) { this.value = achado.id; document.getElementById('nomePosto').value = achado.nome.toUpperCase(); }
-
-        else { alert("❌ Posto inexistente!"); this.value = ""; }
-
-    });
+    if (achado) { 
+        this.value = achado.id; 
+        document.getElementById('nomePosto').value = achado.nome.toUpperCase(); 
+    } else { 
+        alert("❌ Posto inexistente!"); 
+        this.value = ""; 
+        document.getElementById('nomePosto').value = "";
+    }
+});
 
 
 
