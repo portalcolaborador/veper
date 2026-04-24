@@ -70,20 +70,24 @@
 
         /* ESCALA COMPACTA */
         .celula-dia {
-            width: 32px !important; min-width: 32px !important; height: 38px !important;
-            padding: 0 !important; font-size: 9px !important; text-align: center;
+            width: 32px !important; min-width: 32px !important; height: 32px !important;
+            padding: 0 !important; font-size: 11px !important; text-align: center;
             vertical-align: middle; border: 1px solid var(--border); box-sizing: border-box; overflow: hidden;
         }
 
         .dia-trabalhado {
             background-color: #007bff !important; color: white !important;
-            display: flex !important; flex-direction: column; align-items: center;
-            justify-content: center; font-weight: bold; line-height: 1 !important; height: 100%;
+            font-weight: bold; cursor: help;
+        }
+
+        .coluna-total {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            color: var(--success) !important;
+            font-weight: 800 !important;
+            border-left: 2px solid var(--success) !important;
         }
 
         .data-destaque { color: #FF0000 !important; font-weight: 900 !important; }
-
-        .hora-escala { font-size: 7px !important; font-weight: normal !important; margin-top: 1px; display: block; letter-spacing: -0.5px; }
 
         #corpoCalendario td:first-child {
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; vertical-align: middle;
@@ -251,6 +255,10 @@
                     }
                     cabecalho.appendChild(th);
                 }
+                let thTotal = document.createElement('th');
+                thTotal.innerText = "TOTAL";
+                thTotal.className = 'celula-dia coluna-total';
+                cabecalho.appendChild(thTotal);
             }
 
             corpo.innerHTML = ""; 
@@ -261,23 +269,23 @@
                 tdNome.title = escala[mat].nome;
                 row.appendChild(tdNome);
 
+                let contador = 0;
                 for (let d = 1; d <= ultimoDia; d++) {
                     let tdDia = document.createElement('td');
                     tdDia.className = 'celula-dia';
                     let registro = escala[mat].dias.find(item => item.dia === d);
                     if (registro) {
-                        let postoExibicao = registro.posto;
-                        let estiloPosto = postoExibicao.length > 3 ? 'style="font-size: 7px;"' : '';
-                        let html = `<span ${estiloPosto}>${postoExibicao}</span>`;
-                        if (registro.horario) {
-                            let horaCurta = registro.horario.replace(/:00/g, '');
-                            html += `<span class="hora-escala">${horaCurta}</span>`;
-                        }
-                        tdDia.innerHTML = html;
+                        contador++;
+                        tdDia.innerText = registro.posto;
+                        tdDia.title = `Posto: ${registro.posto}${registro.horario ? '\nHorário: ' + registro.horario : ''}`;
                         tdDia.classList.add('dia-trabalhado');
                     }
                     row.appendChild(tdDia);
                 }
+                let tdTotal = document.createElement('td');
+                tdTotal.className = 'celula-dia coluna-total';
+                tdTotal.innerText = contador;
+                row.appendChild(tdTotal);
                 corpo.appendChild(row);
             }
         } catch (e) { console.error("Erro no calendário:", e); }
