@@ -182,6 +182,12 @@ body {
 
 }
 
+        /* Estilo para Sábados, Domingos e Feriados */
+.dia-feriado {
+    background-color: rgba(239, 68, 68, 0.2) !important; /* Vermelho suave para não ofuscar o texto */
+    color: #fca5a5 !important;
+}
+
 
 
 /* Ajuste das células para ficarem quadradas e alinhadas */
@@ -488,111 +494,79 @@ body {
 
 
 async function carregarCalendario() {
-
     try {
-
         const response = await fetch(`${API_URL}?acao=get_calendario`);
-
         const escala = await response.json();
-
         const corpo = document.getElementById('corpoCalendario');
-
         const cabecalho = document.getElementById('cabecalhoDias');
-
         
-
-        // Descobre quantos dias tem o mês atual
-
         const hoje = new Date();
+        const anoAtual = hoje.getFullYear();
+        const mesAtual = hoje.getMonth();
+        const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate();
 
-        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+        // Lista de feriados (Exemplo: 01/05, 07/09, 12/10, 02/11, 15/11, 25/12)
+        // Adicione os feriados de Foz do Iguaçu aqui se desejar
+        const feriados = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "25/12"];
 
-
-
-        // 1. Monta o cabeçalho de 1 a 31 (apenas se estiver vazio)
-
+        // 1. Monta o cabeçalho
         if (cabecalho.cells.length <= 1) {
-
             for (let d = 1; d <= ultimoDia; d++) {
-
                 let th = document.createElement('th');
-
                 th.innerText = d;
-
                 th.className = 'celula-dia';
 
-                cabecalho.appendChild(th);
+                // Lógica de Sábado (6) e Domingo (0)
+                let dataVerificar = new Date(anoAtual, mesAtual, d);
+                let diaSemana = dataVerificar.getDay();
+                let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
 
-            }
-
-        }
-
-
-
-        // 2. Monta as linhas dos colaboradores
-
-        corpo.innerHTML = "";
-
-        for (let mat in escala) {
-
-            let row = document.createElement('tr');
-
-            
-
-            // Coluna do Nome
-
-            let tdNome = document.createElement('td');
-
-            tdNome.innerText = escala[mat].nome;
-
-            tdNome.style.textAlign = "left";
-
-            tdNome.style.paddingLeft = "10px";
-
-            row.appendChild(tdNome);
-
-
-
-            // Colunas dos Dias
-
-            for (let d = 1; d <= ultimoDia; d++) {
-
-                let tdDia = document.createElement('td');
-
-                tdDia.className = 'celula-dia';
-
-                
-
-                // Verifica se o colaborador trabalhou neste dia
-
-                let registro = escala[mat].dias.find(item => item.dia === d);
-
-                
-
-                if (registro) {
-
-                    tdDia.innerText = registro.posto; // Coloca o número do posto
-
-                    tdDia.classList.add('dia-trabalhado'); // Pinta de azul
-
+                if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
+                    th.classList.add('dia-feriado');
                 }
 
-                
-
-                row.appendChild(tdDia);
-
+                cabecalho.appendChild(th);
             }
-
-            corpo.innerHTML += row.outerHTML;
-
         }
 
+        // 2. Monta as linhas
+        corpo.innerHTML = "";
+        for (let mat in escala) {
+            let row = document.createElement('tr');
+            
+            let tdNome = document.createElement('td');
+            tdNome.innerText = escala[mat].nome;
+            tdNome.style.textAlign = "left";
+            tdNome.style.paddingLeft = "10px";
+            row.appendChild(tdNome);
+
+            for (let d = 1; d <= ultimoDia; d++) {
+                let tdDia = document.createElement('td');
+                tdDia.className = 'celula-dia';
+                
+                // Aplicar fundo vermelho na célula da linha também
+                let dataVerificar = new Date(anoAtual, mesAtual, d);
+                let diaSemana = dataVerificar.getDay();
+                let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
+
+                if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
+                    tdDia.classList.add('dia-feriado');
+                }
+
+                let registro = escala[mat].dias.find(item => item.dia === d);
+                if (registro) {
+                    tdDia.innerText = registro.posto;
+                    tdDia.classList.add('dia-trabalhado'); 
+                    // O azul do 'dia-trabalhado' vai sobressair ao vermelho se o cara trabalhar
+                }
+                
+                row.appendChild(tdDia);
+            }
+            corpo.appendChild(row);
+        }
     } catch (e) {
-
         console.error("Erro ao carregar o calendário:", e);
-
     }
-
 }
 
 
@@ -727,23 +701,22 @@ carregarCalendario();
 
     });
 
+document.getElementById('numPosto').addEventListener('blur', function() {
+    let val = this.value.trim().toUpperCase(); // Pega o valor em maiúsculo
+    if (!val) return;
 
+    // Busca o posto comparando diretamente como String, sem forçar número
+    const achado = userLogado.postos.find(p => p.id.toString().toUpperCase() === val);
 
-    document.getElementById('numPosto').addEventListener('blur', function() {
-
-        let val = this.value.trim(); if (!val) return;
-
-        const idLimpo = parseInt(val, 10).toString();
-
-        const achado = userLogado.postos.find(p => p.id.toString() === idLimpo);
-
-        if (achado) { this.value = achado.id; document.getElementById('nomePosto').value = achado.nome.toUpperCase(); }
-
-        else { alert("❌ Posto inexistente!"); this.value = ""; }
-
-    });
-
-
+    if (achado) { 
+        this.value = achado.id; 
+        document.getElementById('nomePosto').value = achado.nome.toUpperCase(); 
+    } else { 
+        alert("❌ Posto inexistente!"); 
+        this.value = ""; 
+        document.getElementById('nomePosto').value = "";
+    }
+});
 
 async function validarCompliance() {
     const mat = document.getElementById('matCobertura').value;
