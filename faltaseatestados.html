@@ -69,16 +69,15 @@
         td { padding: 12px; border-bottom: 1px solid var(--border); }
 
         .celula-dia {
-            width: 32px !important; min-width: 32px !important; height: 32px !important;
+            width: 32px; min-width: 32px; height: 32px;
             padding: 0 !important; font-size: 11px !important; text-align: center;
-            vertical-align: middle; border: 1px solid var(--border); box-sizing: border-box; overflow: hidden;
+            vertical-align: middle; border: 1px solid var(--border);
         }
 
-        .dia-trabalhado { background-color: #007bff !important; color: white !important; font-weight: bold; cursor: help; }
-        .coluna-total { background-color: rgba(16, 185, 129, 0.15) !important; color: var(--success) !important; font-weight: 800 !important; border-left: 2px solid var(--success) !important; }
+        .dia-trabalhado { background-color: #007bff !important; color: white !important; font-weight: bold; }
+        .coluna-total { background-color: rgba(16, 185, 129, 0.15) !important; color: var(--success) !important; font-weight: 800; border-left: 2px solid var(--success) !important; }
         .data-destaque { color: #FF0000 !important; font-weight: 900 !important; }
 
-        #corpoCalendario td:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; vertical-align: middle; }
         #overlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; background: rgba(2, 4, 10, 0.9); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .loader { width: 35px; height: 35px; border: 4px solid var(--border); border-bottom-color: var(--primary); border-radius: 50%; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
@@ -134,11 +133,11 @@
             </div>
             <div class="form-group">
                 <label>Entrada</label>
-                <input type="tel" class="input-hora" id="horaEnt" placeholder="00:00" maxlength="5" oninput="maskHora(this)" required>
+                <input type="tel" id="horaEnt" placeholder="00:00" maxlength="5" oninput="maskHora(this)" required>
             </div>
             <div class="form-group">
                 <label>Saída</label>
-                <input type="tel" class="input-hora" id="horaSai" placeholder="00:00" maxlength="5" oninput="maskHora(this)" required>
+                <input type="tel" id="horaSai" placeholder="00:00" maxlength="5" oninput="maskHora(this)" required>
             </div>
         </div>
 
@@ -183,7 +182,7 @@
 </div>
 
 <div class="mirror-container">
-    <div class="section-header" style="color:var(--primary)">📋 Histórico de Lançamentos (Tempo Real)</div>
+    <div class="section-header" style="color:var(--primary)">📋 Histórico (Últimos 50 Lançamentos)</div>
     <div class="table-wrapper">
         <table>
             <thead>
@@ -204,6 +203,7 @@
     let userLogado = JSON.parse(localStorage.getItem('veper_user'));
     let lastKey = "";
 
+    // BLOCO DE INICIALIZAÇÃO
     (function() {
         if (!userLogado || !userLogado.nome) { 
             window.location.href = 'index.html'; 
@@ -215,7 +215,7 @@
         }
     })();
 
-    // VERIFICAÇÃO AUTOMÁTICA DE RECICLAGEM E FOLGA
+    // VERIFICAÇÃO AUTOMÁTICA (CHAMADA AO GS)
     document.getElementById('nomeCobertura').addEventListener('blur', async function() {
         const nome = this.value.toUpperCase().trim();
         const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === nome);
@@ -227,26 +227,28 @@
             
             if(!data || !hora) return;
 
-            const response = await fetch(`${API_URL}?acao=check_compliance&mat=${achado.mat}&data=${data}&hora=${hora}`);
-            const status = await response.json();
-            
-            const cardRec = document.getElementById('cardReciclagem');
-            const cardFolga = document.getElementById('cardFolga');
-            
-            cardRec.style.display = 'flex';
-            cardRec.innerText = `RECICLAGEM: ${status.reciclagem.mensagem}`;
-            cardRec.className = `status-box ${status.reciclagem.ok ? 'bg-ok' : 'bg-error'}`;
-            
-            cardFolga.style.display = 'flex';
-            cardFolga.innerText = `FOLGA 36H: ${status.folga36h.mensagem}`;
-            cardFolga.className = `status-box ${status.folga36h.ok ? 'bg-ok' : 'bg-error'}`;
+            try {
+                const response = await fetch(`${API_URL}?acao=check_compliance&mat=${achado.mat}&data=${data}&hora=${hora}`);
+                const status = await response.json();
+                
+                const cardRec = document.getElementById('cardReciclagem');
+                const cardFolga = document.getElementById('cardFolga');
+                
+                cardRec.style.display = 'flex';
+                cardRec.innerText = `RECICLAGEM: ${status.reciclagem.mensagem}`;
+                cardRec.className = `status-box ${status.reciclagem.ok ? 'bg-ok' : 'bg-error'}`;
+                
+                cardFolga.style.display = 'flex';
+                cardFolga.innerText = `FOLGA 36H: ${status.folga36h.mensagem}`;
+                cardFolga.className = `status-box ${status.folga36h.ok ? 'bg-ok' : 'bg-error'}`;
+            } catch(e) { console.error("Erro na verificação."); }
         }
     });
 
     async function carregarCalendario() {
         try {
             const response = await fetch(`${API_URL}?acao=get_calendario`);
-            const escala = await response.json(); // GS agora envia como Lista (Array)
+            const escala = await response.json(); 
             const corpo = document.getElementById('corpoCalendario');
             const cabecalho = document.getElementById('cabecalhoDias');
             
@@ -254,35 +256,25 @@
             const anoAtual = hoje.getFullYear();
             const mesAtual = hoje.getMonth();
             const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate();
-            const feriados = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"];
 
+            // Gera cabeçalho uma vez
             if (cabecalho.cells.length <= 1) {
                 for (let d = 1; d <= ultimoDia; d++) {
                     let th = document.createElement('th');
-                    th.innerText = d;
-                    th.className = 'celula-dia';
-                    let dataVerificar = new Date(anoAtual, mesAtual, d);
-                    let diaSemana = dataVerificar.getDay();
-                    let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
-                    if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
-                        th.classList.add('data-destaque');
-                    }
+                    th.innerText = d; th.className = 'celula-dia';
                     cabecalho.appendChild(th);
                 }
                 let thTotal = document.createElement('th');
-                thTotal.innerText = "TOTAL";
-                thTotal.className = 'celula-dia coluna-total';
+                thTotal.innerText = "TOT"; thTotal.className = 'celula-dia coluna-total';
                 cabecalho.appendChild(thTotal);
             }
 
             corpo.innerHTML = "";
-            // AJUSTADO PARA LER LISTA (ARRAY) DO GS
+            // Loop para ARRAY vindo do GS (escala.forEach)
             escala.forEach(item => {
                 let row = document.createElement('tr');
                 let tdNome = document.createElement('td');
-                tdNome.innerText = item.nome;
-                tdNome.title = item.nome;
-                row.appendChild(tdNome);
+                tdNome.innerText = item.nome; row.appendChild(tdNome);
 
                 let contador = 0;
                 for (let d = 1; d <= ultimoDia; d++) {
@@ -292,7 +284,6 @@
                     if (registro) {
                         contador++;
                         tdDia.innerText = registro.posto;
-                        tdDia.title = `Posto: ${registro.posto}${registro.horario ? '\nHorário: ' + registro.horario : ''}`;
                         tdDia.classList.add('dia-trabalhado');
                     }
                     row.appendChild(tdDia);
@@ -303,7 +294,7 @@
                 row.appendChild(tdTotal);
                 corpo.appendChild(row);
             });
-        } catch (e) { console.error("Erro no calendário:", e); }
+        } catch (e) { console.error("Erro escala."); }
     }
 
     async function carregarHistoricoRealtime() {
@@ -315,8 +306,7 @@
             dados.forEach(item => {
                 corpo.innerHTML += `<tr>
                     <td>${item.data}</td><td>${item.nome}</td><td>${item.posto}</td>
-                    <td>${item.motivo}</td><td>${item.entrada || "-"}</td>
-                    <td>${item.saida || "-"}</td><td>${item.intermitente || "-"}</td>
+                    <td>${item.motivo}</td><td>${item.entrada}</td><td>${item.saida}</td><td>${item.intermitente}</td>
                 </tr>`;
             });
         } catch (e) { console.log("Erro histórico."); }
@@ -350,15 +340,11 @@
     document.getElementById('nomeAusente').addEventListener('blur', function() {
         const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === this.value.toUpperCase().trim());
         if (achado) { this.value = achado.nome.toUpperCase(); document.getElementById('matAusente').value = achado.mat; }
-        else if (this.value !== "") { alert("❌ Selecione da lista!"); this.value = ""; }
     });
 
     document.getElementById('numPosto').addEventListener('blur', function() {
-        let val = this.value.trim().toUpperCase();
-        if (!val) return;
-        const achado = userLogado.postos.find(p => p.id.toString().toUpperCase() === val);
-        if (achado) { this.value = achado.id; document.getElementById('nomePosto').value = achado.nome.toUpperCase(); }
-        else { alert("❌ Posto inexistente!"); this.value = ""; }
+        const achado = userLogado.postos.find(p => p.id.toString() === this.value.trim());
+        if (achado) { document.getElementById('nomePosto').value = achado.nome.toUpperCase(); }
     });
 
     document.getElementById('formFalta').onsubmit = async (e) => {
@@ -385,12 +371,12 @@
                 alert("✅ Sucesso!");
                 document.getElementById('formFalta').reset();
                 carregarHistoricoRealtime(); carregarCalendario();
-            } else { alert("Erro: " + res.mensagem); }
-        } catch (e) { alert("Erro de conexão."); }
+            }
+        } catch (e) { alert("Erro ao salvar."); }
         document.getElementById('overlay').style.display = 'none';
     };
 
-    setInterval(carregarHistoricoRealtime, 10000);
+    setInterval(carregarHistoricoRealtime, 30000); // Atualiza histórico a cada 30s
 </script>
 </body>
 </html>
