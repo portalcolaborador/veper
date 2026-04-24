@@ -1,380 +1,882 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Painel de Faltas - Gestor MAIKE</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+
     <style>
+
+body { 
+
+    display: none;
+
+    font-family: 'Geist', sans-serif; 
+
+    background-color: var(--bg-page); 
+
+    color: var(--text-main); 
+
+    margin: 0; 
+
+    padding: 15px; 
+
+    flex-direction: column; 
+
+    align-items: center; 
+
+    min-height: 100vh; 
+
+}
+
+
         :root {
+
             --bg-page: #04060b; --bg-card: #0c111d; --bg-input: #111827; --border: #20293a;
+
             --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.2); --text-main: #f3f4f6;
+
             --text-muted: #8391a3; --success: #10b981; --danger: #ef4444;
+
         }
 
-        body { 
-            display: none; font-family: 'Geist', sans-serif; background-color: var(--bg-page); 
-            color: var(--text-main); margin: 0; padding: 15px; flex-direction: column; 
-            align-items: center; min-height: 100vh; 
-        }
+        
+
+        body { font-family: 'Geist', sans-serif; background-color: var(--bg-page); color: var(--text-main); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+
 
         .container, .mirror-container { 
+
             width: 98%; max-width: 100%; background-color: var(--bg-card); padding: 30px; 
+
             border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.6);
+
             margin-bottom: 15px; box-sizing: border-box;
+
         }
+
+
 
         h2 { font-size: 1.6rem; font-weight: 800; margin: 0 0 25px 0; display: flex; align-items: center; gap: 12px; }
+
         h2::before { content: ''; width: 4px; height: 26px; background: var(--primary); border-radius: 4px; }
+
         
+
         .section-header { display: flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 30px 0 15px; letter-spacing: 1.5px;}
+
         .section-header::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
+
+
         .form-row { display: grid; gap: 20px; margin-bottom: 20px; align-items: flex-end; }
+
         
+
         @media (min-width: 1000px) { 
+
             .col-main { grid-template-columns: 120px 1fr 100px 280px; } 
+
             .col-posto { grid-template-columns: 80px 1fr 100px 100px; }
+
             .col-cobertura { grid-template-columns: 1fr 100px 220px 220px; }
+
             .col-btn { grid-template-columns: 1fr 1fr; width: 350px; margin-left: auto; gap: 15px; } 
+
         }
+
+
 
         .form-group { display: flex; flex-direction: column; min-width: 0; }
+
         label { margin-bottom: 8px; font-weight: 600; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
         
+
         input, select, textarea { 
+
             width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+
             font-size: 14px; color: var(--text-main); background-color: var(--bg-input); transition: all 0.2s ease; 
+
             box-sizing: border-box;
+
         }
+
         
+
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
         .readonly { background-color: rgba(31, 41, 55, 0.4); color: #737f8f; cursor: not-allowed; border-color: transparent; }
 
+
+
         .status-box { 
+
             padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; 
+
             text-align: center; height: 43px; display: flex; align-items: center; 
+
             justify-content: center; box-sizing: border-box; line-height: 1.2;
+
         }
+
         .bg-ok { background: rgba(16, 185, 129, 0.1); color: #bef264; border-color: rgba(16, 185, 129, 0.2); }
+
         .bg-error { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border-color: rgba(239, 68, 68, 0.2); }
 
+
+
         button { width: 100%; padding: 14px; border: none; font-weight: 700; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;}
+
         .btn-salvar { background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+
         .btn-voltar { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
 
+
+
+        /* Estilos da Tabela em Tempo Real */
+
         .table-wrapper { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-card); width: 100%; }
+
         table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-main); text-align: left; }
+
         th { background: var(--bg-input); padding: 12px; border-bottom: 2px solid var(--border); color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+
         td { padding: 12px; border-bottom: 1px solid var(--border); }
 
-        /* ESCALA COMPACTA */
-        .celula-dia {
-            width: 32px !important; min-width: 32px !important; height: 32px !important;
-            padding: 0 !important; font-size: 11px !important; text-align: center;
-            vertical-align: middle; border: 1px solid var(--border); box-sizing: border-box; overflow: hidden;
-        }
+        tr:last-child td { border-bottom: none; }
 
-        .dia-trabalhado {
-            background-color: #007bff !important; color: white !important;
-            font-weight: bold; cursor: help;
-        }
+        tr:hover { background: rgba(59, 130, 246, 0.05); }
 
-        .coluna-total {
-            background-color: rgba(16, 185, 129, 0.15) !important;
-            color: var(--success) !important;
-            font-weight: 800 !important;
-            border-left: 2px solid var(--success) !important;
-        }
 
-        .data-destaque { color: #FF0000 !important; font-weight: 900 !important; }
-
-        #corpoCalendario td:first-child {
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; vertical-align: middle;
-        }
 
         #overlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; background: rgba(2, 4, 10, 0.9); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+
         .loader { width: 35px; height: 35px; border: 4px solid var(--border); border-bottom-color: var(--primary); border-radius: 50%; animation: rotation 1s linear infinite; }
+
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+
+
+/* Estilo para destacar o dia trabalhado */
+
+.dia-trabalhado {
+
+    background-color: #007bff !important; /* Azul padrão */
+
+    color: white !important;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    font-size: 11px;
+
+}
+
+
+
+/* Ajuste das células para ficarem quadradas e alinhadas */
+
+.celula-dia {
+
+    width: 30px;
+
+    min-width: 30px;
+
+    height: 30px;
+
+    text-align: center;
+
+    border: 1px solid var(--border); /* <--- USE A VARIÁVEL AQUI */
+
+    padding: 0 !important;
+
+}
+
+
     </style>
+
 </head>
+
 <body>
+
+
 
 <div id="overlay"><div class="loader"></div></div>
 
+
+
 <div class="container">
+
     <h2>Lançamentos</h2>
+
     <form id="formFalta">
+
         <div class="section-header" style="color:var(--primary)">Informações Básicas e Ausente</div>
+
         <div class="form-row col-main">
+
             <div class="form-group">
+
                 <label>Data</label>
+
                 <input type="tel" id="dataPlantao" placeholder="00/00/0000" maxlength="10" oninput="maskData(this)" required>
+
             </div>
+
             <div class="form-group">
+
                 <label>Nome do Colaborador (Ausente)</label>
+
                 <input type="text" id="nomeAusente" list="lColaboradores" placeholder="Pesquisar..." required>
+
             </div>
+
             <div class="form-group">
+
                 <label>Matrícula</label>
+
                 <input type="text" id="matAusente" class="readonly" readonly required>
+
             </div>
+
             <div class="form-group">
+
                 <label>Motivo</label>
+
                 <select id="motivo" required>
+
                     <option value="">SELECIONE...</option>
+
                     <option value="ATESTADO MÉDICO">ATESTADO MÉDICO</option>
+
                     <option value="FALTA">FALTA</option>
+
                     <option value="RECICLAGEM">RECICLAGEM</option>
+
                     <option value="ATRASO">ATRASO</option>
+
                     <option value="REMANEJAMENTO">REMANEJAMENTO</option>
+
                     <option value="COBERTURA DE POSTO">COBERTURA DE POSTO</option>
+
                     <option value="SUSPENSÃO">SUSPENSÃO</option>
+
                     <option value="DEMISSÃO">DEMISSÃO</option>
+
                     <option value="TROCA DE HORÁRIO">TROCA DE HORÁRIO</option>
+
                 </select>
+
             </div>
+
         </div>
+
+
 
         <div class="section-header" style="color:var(--primary)">Posto e Horário</div>
+
         <div class="form-row col-posto">
+
             <div class="form-group">
+
                 <label>Nº Posto</label>
-                <input type="text" id="numPosto" list="lPostos" placeholder="Ex: 6" required>
+
+                <input type="tel" id="numPosto" list="lPostos" placeholder="Ex: 6" required>
+
             </div>
+
             <div class="form-group">
+
                 <label>Nome do Posto (Automático)</label>
+
                 <input type="text" id="nomePosto" class="readonly" readonly required>
+
             </div>
+
             <div class="form-group">
+
                 <label>Entrada</label>
+
                 <input type="tel" class="input-hora" id="horaEnt" placeholder="00:00" maxlength="5" oninput="maskHora(this)" required>
+
             </div>
+
             <div class="form-group">
+
                 <label>Saída</label>
+
                 <input type="tel" class="input-hora" id="horaSai" placeholder="00:00" maxlength="5" oninput="maskHora(this)" required>
+
             </div>
+
         </div>
+
+
 
         <div class="section-header" style="color:var(--success)">Cobertura (Intermitente)</div>
+
         <div class="form-row col-cobertura">
+
             <div class="form-group">
+
                 <label>Nome do Intermitente</label>
+
                 <input type="text" id="nomeCobertura" list="lColaboradores" placeholder="Pesquisar...">
+
             </div>
+
             <div class="form-group">
+
                 <label>Matrícula</label>
+
                 <input type="text" id="matCobertura" class="readonly" readonly>
+
             </div>
+
             <div id="cardReciclagem" class="status-box" style="display:none;">--</div>
+
             <div id="cardFolga" class="status-box" style="display:none;">--</div>
+
         </div>
+
+
 
         <div class="form-group" style="margin-top:10px;">
+
             <label>Observações</label>
+
             <textarea id="obs" rows="2" placeholder="Notas do lançamento..."></textarea>
+
         </div>
+
+
 
         <div class="form-row col-btn" style="margin-top: 25px;">
+
             <button type="button" class="btn-voltar" onclick="window.location.href='index.html'">⬅ Menu</button>
+
             <button type="submit" id="btnSalvar" class="btn-salvar">💾 Salvar Lançamento</button>
+
         </div>
+
     </form>
+
 </div>
 
-<div class="mirror-container">
+
+
+<div class="mirror-container" style="margin-top: 0px;">
+
     <div class="section-header" style="color:var(--primary)">📅 Escala de Intermitentes (Mês Atual)</div>
+
     <div class="table-wrapper" style="overflow-x: auto;">
-        <table style="min-width: 1100px;">
+
+        <table style="min-width: 1000px;">
+
             <thead>
+
                 <tr id="cabecalhoDias">
-                    <th style="width: 180px; text-align: left; padding-left: 15px;">Colaborador</th>
-                </tr>
+
+                    <th style="width: 200px; text-align: left; padding-left: 15px;">Colaborador</th>
+
+                    </tr>
+
             </thead>
-            <tbody id="corpoCalendario"></tbody>
+
+            <tbody id="corpoCalendario">
+
+                </tbody>
+
         </table>
+
     </div>
+
 </div>
 
+
+
 <div class="mirror-container">
+
     <div class="section-header" style="color:var(--primary)">📋 Histórico de Lançamentos (Tempo Real)</div>
+
     <div class="table-wrapper">
+
         <table>
+
             <thead>
+
                 <tr>
-                    <th>Data</th><th>Ausente</th><th>Posto</th><th>Motivo</th><th>Entrada</th><th>Saída</th><th>Intermitente</th>
+
+                    <th>Data</th>
+
+                    <th>Ausente</th>
+
+                    <th>Posto</th>
+
+                    <th>Motivo</th>
+
+<th>Entrada</th>
+
+<th>Saída</th>
+
+<th>Intermitente</th>
+
+
+
                 </tr>
+
             </thead>
-            <tbody id="corpoTabela"></tbody>
+
+            <tbody id="corpoTabela">
+
+                </tbody>
+
         </table>
+
     </div>
+
 </div>
+
+
 
 <datalist id="lColaboradores"></datalist>
+
 <datalist id="lPostos"></datalist>
 
+
+
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwXCAIp77nB9wVVBm8me9fqoLNHrY2vZi5UCwrrqrNaANANrEzDWRro4YIvCIfvfY3F/exec";
-    let userLogado = JSON.parse(localStorage.getItem('veper_user'));
-    let lastKey = "";
 
     (function() {
+
+        const userLogado = JSON.parse(localStorage.getItem('veper_user'));
+
+        
+
         if (!userLogado || !userLogado.nome) { 
+
+            // Se não está logado, manda para o login imediatamente
+
             window.location.href = 'index.html'; 
+
         } else {
+
+            // Se está logado, mostra a página
+
             document.addEventListener("DOMContentLoaded", function() {
-                document.body.style.display = "flex";
-                carregarDados();
+
+                document.body.style.display = "flex"; // Ou "block", dependendo do seu layout
+
+                console.log("Acesso autorizado para: " + userLogado.nome);
+
             });
+
         }
+
     })();
 
-    async function carregarCalendario() {
-        try {
-            const response = await fetch(`${API_URL}?acao=get_calendario`);
-            const escala = await response.json();
-            const corpo = document.getElementById('corpoCalendario');
-            const cabecalho = document.getElementById('cabecalhoDias');
+
+
+async function carregarCalendario() {
+
+    try {
+
+        const response = await fetch(`${API_URL}?acao=get_calendario`);
+
+        const escala = await response.json();
+
+        const corpo = document.getElementById('corpoCalendario');
+
+        const cabecalho = document.getElementById('cabecalhoDias');
+
+        
+
+        // Descobre quantos dias tem o mês atual
+
+        const hoje = new Date();
+
+        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+
+
+
+        // 1. Monta o cabeçalho de 1 a 31 (apenas se estiver vazio)
+
+        if (cabecalho.cells.length <= 1) {
+
+            for (let d = 1; d <= ultimoDia; d++) {
+
+                let th = document.createElement('th');
+
+                th.innerText = d;
+
+                th.className = 'celula-dia';
+
+                cabecalho.appendChild(th);
+
+            }
+
+        }
+
+
+
+        // 2. Monta as linhas dos colaboradores
+
+        corpo.innerHTML = "";
+
+        for (let mat in escala) {
+
+            let row = document.createElement('tr');
+
             
-            const hoje = new Date();
-            const anoAtual = hoje.getFullYear();
-            const mesAtual = hoje.getMonth();
-            const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate();
-            const feriados = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"];
 
-            if (cabecalho.cells.length <= 1) {
-                for (let d = 1; d <= ultimoDia; d++) {
-                    let th = document.createElement('th');
-                    th.innerText = d;
-                    th.className = 'celula-dia';
-                    let dataVerificar = new Date(anoAtual, mesAtual, d);
-                    let diaSemana = dataVerificar.getDay();
-                    let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
-                    if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
-                        th.classList.add('data-destaque');
-                    }
-                    cabecalho.appendChild(th);
+            // Coluna do Nome
+
+            let tdNome = document.createElement('td');
+
+            tdNome.innerText = escala[mat].nome;
+
+            tdNome.style.textAlign = "left";
+
+            tdNome.style.paddingLeft = "10px";
+
+            row.appendChild(tdNome);
+
+
+
+            // Colunas dos Dias
+
+            for (let d = 1; d <= ultimoDia; d++) {
+
+                let tdDia = document.createElement('td');
+
+                tdDia.className = 'celula-dia';
+
+                
+
+                // Verifica se o colaborador trabalhou neste dia
+
+                let registro = escala[mat].dias.find(item => item.dia === d);
+
+                
+
+                if (registro) {
+
+                    tdDia.innerText = registro.posto; // Coloca o número do posto
+
+                    tdDia.classList.add('dia-trabalhado'); // Pinta de azul
+
                 }
-                let thTotal = document.createElement('th');
-                thTotal.innerText = "TOTAL";
-                thTotal.className = 'celula-dia coluna-total';
-                cabecalho.appendChild(thTotal);
+
+                
+
+                row.appendChild(tdDia);
+
             }
 
-            corpo.innerHTML = ""; 
-            for (let mat in escala) {
-                let row = document.createElement('tr');
-                let tdNome = document.createElement('td');
-                tdNome.innerText = escala[mat].nome;
-                tdNome.title = escala[mat].nome;
-                row.appendChild(tdNome);
+            corpo.innerHTML += row.outerHTML;
 
-                let contador = 0;
-                for (let d = 1; d <= ultimoDia; d++) {
-                    let tdDia = document.createElement('td');
-                    tdDia.className = 'celula-dia';
-                    let registro = escala[mat].dias.find(item => item.dia === d);
-                    if (registro) {
-                        contador++;
-                        tdDia.innerText = registro.posto;
-                        tdDia.title = `Posto: ${registro.posto}${registro.horario ? '\nHorário: ' + registro.horario : ''}`;
-                        tdDia.classList.add('dia-trabalhado');
-                    }
-                    row.appendChild(tdDia);
-                }
-                let tdTotal = document.createElement('td');
-                tdTotal.className = 'celula-dia coluna-total';
-                tdTotal.innerText = contador;
-                row.appendChild(tdTotal);
-                corpo.appendChild(row);
-            }
-        } catch (e) { console.error("Erro no calendário:", e); }
+        }
+
+    } catch (e) {
+
+        console.error("Erro ao carregar o calendário:", e);
+
     }
 
-    async function carregarHistoricoRealtime() {
-        try {
-            const response = await fetch(`${API_URL}?acao=get_historico`);
-            const dados = await response.json();
-            const corpo = document.getElementById('corpoTabela');
-            corpo.innerHTML = ""; 
-            dados.forEach(item => {
-                corpo.innerHTML += `<tr>
-                    <td>${item.data}</td><td>${item.nome}</td><td>${item.posto}</td>
-                    <td>${item.motivo}</td><td>${item.entrada || "-"}</td>
-                    <td>${item.saida || "-"}</td><td>${item.intermitente || "-"}</td>
-                </tr>`;
-            });
-        } catch (e) { console.log("Erro histórico."); }
-    }
+}
 
-    function carregarDados() {
-        const dlColab = document.getElementById('lColaboradores');
-        const dlPosto = document.getElementById('lPostos');
-        dlColab.innerHTML = ""; dlPosto.innerHTML = "";
-        userLogado.colaboradores.forEach(c => { dlColab.innerHTML += `<option value="${c.nome.toUpperCase()}">`; });
-        userLogado.postos.forEach(p => { dlPosto.innerHTML += `<option value="${p.id}">`; });
-        carregarHistoricoRealtime();
-        carregarCalendario();
-    }
+
+
+    const API_URL = "https://script.google.com/macros/s/AKfycbwXCAIp77nB9wVVBm8me9fqoLNHrY2vZi5UCwrrqrNaANANrEzDWRro4YIvCIfvfY3F/exec";
+
+    let userLogado = JSON.parse(localStorage.getItem('veper_user'));
+
+    let lastKey = "";
+
+    if (!userLogado) { window.location.href='index.html'; }
+
+
 
     document.addEventListener('keydown', e => { lastKey = e.key; });
+
+
+
+    // Máscaras e Validações
+
     function maskData(i) {
+
         if (lastKey === "Backspace") return;
+
         let v = i.value.replace(/\D/g, '');
+
         if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
+
         if (v.length >= 5) v = v.substring(0,5) + '/' + v.substring(5);
+
         i.value = v.substring(0, 10);
+
     }
+
     function maskHora(i) {
+
         if (lastKey === "Backspace") return;
+
         let v = i.value.replace(/\D/g, '');
+
         if (v.length >= 2) v = v.substring(0,2) + ':' + v.substring(2);
+
         i.value = v.substring(0, 5);
+
     }
 
-    document.getElementById('nomeAusente').addEventListener('blur', function() {
-        const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === this.value.toUpperCase().trim());
-        if (achado) { this.value = achado.nome.toUpperCase(); document.getElementById('matAusente').value = achado.mat; }
-        else if (this.value !== "") { alert("❌ Selecione da lista!"); this.value = ""; }
-    });
 
-    document.getElementById('numPosto').addEventListener('blur', function() {
-        let val = this.value.trim().toUpperCase();
-        if (!val) return;
-        const achado = userLogado.postos.find(p => p.id.toString().toUpperCase() === val);
-        if (achado) { this.value = achado.id; document.getElementById('nomePosto').value = achado.nome.toUpperCase(); }
-        else { alert("❌ Posto inexistente!"); this.value = ""; }
-    });
 
-    document.getElementById('formFalta').onsubmit = async (e) => {
-        e.preventDefault();
-        document.getElementById('overlay').style.display = 'flex';
-        const payload = {
-            acao: "salvar_falta", supervisor: userLogado.nome.toUpperCase(),
-            dataPlantao: document.getElementById('dataPlantao').value,
-            matAusente: document.getElementById('matAusente').value,
-            nomeAusente: document.getElementById('nomeAusente').value.toUpperCase(),
-            numPosto: document.getElementById('numPosto').value,
-            nomePosto: document.getElementById('nomePosto').value.toUpperCase(),
-            horaEnt: document.getElementById('horaEnt').value,
-            horaSai: document.getElementById('horaSai').value,
-            motivo: document.getElementById('motivo').value,
-            matCobertura: document.getElementById('matCobertura').value || "-",
-            nomeCobertura: document.getElementById('nomeCobertura').value.toUpperCase() || "-",
-            obs: document.getElementById('obs').value.toUpperCase()
-        };
+    // Carregar Historico Realtime
+
+    async function carregarHistoricoRealtime() {
+
         try {
-            const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-            const res = await r.json();
-            if (res.status === "sucesso") { 
-                alert("✅ Sucesso!"); document.getElementById('formFalta').reset();
-                carregarHistoricoRealtime(); carregarCalendario();
-            } else { alert("Erro: " + res.mensagem); }
-        } catch (e) { alert("Erro de conexão."); }
-        document.getElementById('overlay').style.display = 'none';
-    };
+
+            const response = await fetch(`${API_URL}?acao=get_historico`);
+
+            const dados = await response.json();
+
+            const corpo = document.getElementById('corpoTabela');
+
+            corpo.innerHTML = ""; 
+
+
+
+            dados.forEach(item => {
+
+                corpo.innerHTML += `
+
+                    <tr style="border-bottom: 1px solid var(--border);">
+
+                        <td style="padding: 12px;">${item.data}</td>
+
+                        <td style="padding: 12px;">${item.nome}</td>
+
+                        <td style="padding: 12px;">${item.posto}</td>
+
+                        <td style="padding: 12px;">${item.motivo}</td>
+
+                        <td style="padding: 12px;">${item.entrada || "-"}</td>
+
+                        <td style="padding: 12px;">${item.saida || "-"}</td>
+
+                        <td style="padding: 12px;">${item.intermitente || "-"}</td>
+
+                    </tr>`;
+
+            });
+
+        } catch (e) {
+
+            console.log("Erro ao carregar histórico.");
+
+        }
+
+    }
+
+
+
+    function carregarDados() {
+
+        const dlColab = document.getElementById('lColaboradores');
+
+        const dlPosto = document.getElementById('lPostos');
+
+        userLogado.colaboradores.forEach(c => { dlColab.innerHTML += `<option value="${c.nome.toUpperCase()}">`; });
+
+        userLogado.postos.forEach(p => { dlPosto.innerHTML += `<option value="${p.id}">`; });
+
+        carregarHistoricoRealtime();
+
+carregarCalendario();
+
+    }
+
+    carregarDados();
+
+
 
     setInterval(carregarHistoricoRealtime, 10000);
+
+
+
+    // Eventos de Autopreenchimento
+
+    document.getElementById('nomeAusente').addEventListener('blur', function() {
+
+        const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === this.value.toUpperCase().trim());
+
+        if (achado) { this.value = achado.nome.toUpperCase(); document.getElementById('matAusente').value = achado.mat; }
+
+        else if (this.value !== "") { alert("❌ Selecione da lista!"); this.value = ""; }
+
+    });
+
+
+
+    document.getElementById('numPosto').addEventListener('blur', function() {
+
+        let val = this.value.trim(); if (!val) return;
+
+        const idLimpo = parseInt(val, 10).toString();
+
+        const achado = userLogado.postos.find(p => p.id.toString() === idLimpo);
+
+        if (achado) { this.value = achado.id; document.getElementById('nomePosto').value = achado.nome.toUpperCase(); }
+
+        else { alert("❌ Posto inexistente!"); this.value = ""; }
+
+    });
+
+
+
+async function validarCompliance() {
+    const mat = document.getElementById('matCobertura').value;
+    const data = document.getElementById('dataPlantao').value;
+    const hora = document.getElementById('horaEnt').value;
+    const cardF = document.getElementById('cardFolga');
+    const btnSalvar = document.getElementById('btnSalvar');
+
+    if (!mat) return;
+
+    // Só dispara o FETCH se a data e hora estiverem com tamanho completo
+    if (data.length < 10 || hora.length < 5) {
+        cardF.innerText = "AGUARDANDO DATA/HORA";
+        cardF.className = "status-box bg-error";
+        cardF.style.display = 'flex';
+        return;
+    }
+
+    document.getElementById('overlay').style.display = 'flex';
+    
+    try {
+        // Usamos encodeURIComponent para garantir que os caracteres "/" e ":" cheguem inteiros no GS
+        const url = `${API_URL}?acao=check_compliance&mat=${mat}&data=${encodeURIComponent(data)}&hora=${encodeURIComponent(hora)}`;
+        const res = await fetch(url);
+        const s = await res.json();
+
+        const cardR = document.getElementById('cardReciclagem');
+        cardR.style.display = 'flex'; 
+        cardF.style.display = 'flex';
+
+        cardR.innerText = "RECICLAGEM: " + s.reciclagem.mensagem;
+        cardR.className = "status-box " + (s.reciclagem.ok ? "bg-ok" : "bg-error");
+
+        cardF.innerText = "FOLGA 36H: " + s.folga36h.mensagem;
+        cardF.className = "status-box " + (s.folga36h.ok ? "bg-ok" : "bg-error");
+
+        btnSalvar.disabled = (!s.reciclagem.ok || !s.folga36h.ok);
+
+    } catch (e) {
+        cardF.innerText = "ERRO NA CONSULTA";
+        console.error(e);
+    } finally {
+        document.getElementById('overlay').style.display = 'none';
+    }
+}
+
+    // Gatilhos para disparar a validação
+    document.getElementById('nomeCobertura').addEventListener('blur', function() {
+        const nome = this.value.toUpperCase().trim();
+        const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === nome);
+        if (achado) {
+            this.value = achado.nome.toUpperCase(); 
+            document.getElementById('matCobertura').value = achado.mat;
+            validarCompliance();
+        }
+    });
+
+    // Se mudar a data ou a hora de entrada, revalida na hora!
+    document.getElementById('dataPlantao').addEventListener('change', validarCompliance);
+    document.getElementById('horaEnt').addEventListener('change', validarCompliance);
+    document.getElementById('dataPlantao').addEventListener('blur', validarCompliance);
+    document.getElementById('horaEnt').addEventListener('blur', validarCompliance);
+
+
+
+    // Submissão do Formulário
+
+    document.getElementById('formFalta').onsubmit = async (e) => {
+
+        e.preventDefault();
+
+        document.getElementById('overlay').style.display = 'flex';
+
+        const payload = {
+
+            acao: "salvar_falta", supervisor: userLogado.nome.toUpperCase(),
+
+            dataPlantao: document.getElementById('dataPlantao').value,
+
+            matAusente: document.getElementById('matAusente').value,
+
+            nomeAusente: document.getElementById('nomeAusente').value.toUpperCase(),
+
+            numPosto: document.getElementById('numPosto').value,
+
+            nomePosto: document.getElementById('nomePosto').value.toUpperCase(),
+
+            horaEnt: document.getElementById('horaEnt').value,
+
+            horaSai: document.getElementById('horaSai').value,
+
+            motivo: document.getElementById('motivo').value,
+
+            matCobertura: document.getElementById('matCobertura').value || "-",
+
+            nomeCobertura: document.getElementById('nomeCobertura').value.toUpperCase() || "-",
+
+            obs: document.getElementById('obs').value.toUpperCase()
+
+        };
+
+        try {
+
+            const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+
+            const res = await r.json();
+
+            if (res.status === "sucesso") { 
+
+                alert("✅ Sucesso!"); 
+
+                document.getElementById('formFalta').reset();
+
+                document.getElementById('cardReciclagem').style.display = 'none';
+
+                document.getElementById('cardFolga').style.display = 'none';
+
+                await carregarHistoricoRealtime(); 
+
+await carregarCalendario();
+
+            } else { alert("Erro: " + res.mensagem); }
+
+        } catch (e) { alert("Erro de conexão."); }
+
+        document.getElementById('overlay').style.display = 'none';
+
+    };
+
 </script>
+
 </body>
+
+
+
 </html>
