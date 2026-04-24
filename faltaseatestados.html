@@ -532,42 +532,49 @@ async function carregarCalendario() {
             cabecalho.appendChild(thT);
         }
 
-        corpo.innerHTML = "";
-        for (let mat in escala) {
+corpo.innerHTML = "";
+        
+        // Mudança para forEach para garantir a ordem vinda do servidor
+        escala.forEach(item => {
             let row = document.createElement('tr');
             let tdNome = document.createElement('td');
-            tdNome.innerText = escala[mat].nome;
+            tdNome.innerText = item.nome;
             tdNome.style.textAlign = "left";
-            tdNome.style.paddingLeft = "10px";
+            tdNome.style.paddingLeft = "15px"; // Ajuste para alinhar com o cabeçalho
             row.appendChild(tdNome);
 
             for (let d = 1; d <= ultimoDia; d++) {
                 let tdDia = document.createElement('td');
                 tdDia.className = 'celula-dia';
                 
-                // Aplica vermelho se for final de semana
-                let dataVerif = new Date(ano, mes, d);
-                if (dataVerif.getDay() === 0 || dataVerif.getDay() === 6) {
-                    tdDia.classList.add('dia-destaque-vermelho');
+                // Aplica vermelho se for final de semana (0=Dom, 6=Sáb)
+                let dataVerif = new Date(hoje.getFullYear(), hoje.getMonth(), d);
+                let diaSemana = dataVerif.getDay();
+                if (diaSemana === 0 || diaSemana === 6) {
+                    tdDia.style.color = "#ef4444";
+                    tdDia.style.fontWeight = "900";
                 }
 
-                let registro = escala[mat].dias.find(item => item.dia === d);
+                // Busca o plantão do dia
+                let registro = item.dias.find(p => p.dia === d);
                 if (registro) {
                     tdDia.innerText = registro.posto;
                     tdDia.classList.add('dia-trabalhado');
-                    tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario}\n👤 Colaborador: ${escala[mat].nome}`;
+                    // Balão com detalhes
+                    tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario || '---'}\n👤 Colaborador: ${item.nome}`;
                 }
                 row.appendChild(tdDia);
             }
 
+            // Coluna de Total Verde
             let tdTotal = document.createElement('td');
             tdTotal.className = 'celula-dia coluna-total';
-            tdTotal.innerText = escala[mat].total;
+            tdTotal.innerText = item.total;
             row.appendChild(tdTotal);
 
             corpo.appendChild(row);
-        }
-    } catch (e) { console.error(e); }
+        });
+    } catch (e) { console.error("Erro na Escala:", e); }
 }
 
 
