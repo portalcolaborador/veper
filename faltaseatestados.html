@@ -166,22 +166,18 @@ body {
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
 
 
-/* Estilo para destacar o dia trabalhado */
-
+/* Formatação do conteúdo dentro do quadrado azul */
 .dia-trabalhado {
-
-    background-color: #007bff !important; /* Azul padrão */
-
+    background-color: #007bff !important;
     color: white !important;
-
+    display: flex !important;
+    flex-direction: column;    /* Posto em cima, Hora embaixo */
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
-
-    text-align: center;
-
-    font-size: 11px;
-
+    line-height: 1.1;          /* Espaçamento entre linhas mais justo */
+    height: 100%;              /* Ocupa todo o espaço da célula */
 }
-
         /* Estilo para Sábados, Domingos e Feriados */
 .data-destaque {
     color: #FF0000 !important; /* Vermelho vivo no número */
@@ -191,22 +187,18 @@ body {
 
 
 
-/* Ajuste das células para ficarem quadradas e alinhadas */
-
+/* Ajuste para que todos os quadrados sejam IDÊNTICOS e comportem o horário */
 .celula-dia {
-
-    width: 30px;
-
-    min-width: 30px;
-
-    height: 30px;
-
-    text-align: center;
-
-    border: 1px solid var(--border); /* <--- USE A VARIÁVEL AQUI */
-
+    width: 70px !important;    /* Largura fixa para caber o texto */
+    min-width: 70px !important;
+    height: 48px !important;   /* Altura fixa para duas linhas */
     padding: 0 !important;
-
+    font-size: 10px !important;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid var(--border);
+    box-sizing: border-box;
+    overflow: hidden;          /* Não deixa o texto vazar do quadrado */
 }
 
         /* Ajuste para os nomes não quebrarem linha e não deformarem os quadrados */
@@ -218,11 +210,13 @@ body {
     vertical-align: middle;    /* Mantém o texto alinhado ao centro do quadrado */
 }
 
-/* Garante que todas as células da tabela tenham a mesma altura */
-.celula-dia {
-    height: 30px;
-    line-height: 30px;         /* Alinha o texto verticalmente */
-    padding: 0 !important;
+
+        /* Estilo para o horário ficar menor e discreto */
+.hora-escala {
+    font-size: 8px !important;
+    font-weight: normal !important;
+    margin-top: 2px;
+    display: block;
 }
 
 
@@ -519,67 +513,64 @@ async function carregarCalendario() {
         const corpo = document.getElementById('corpoCalendario');
         const cabecalho = document.getElementById('cabecalhoDias');
         
-        // Pega a data de hoje para basear o mês
         const hoje = new Date();
         const anoAtual = hoje.getFullYear();
-        const mesAtual = hoje.getMonth(); // 0 = Janeiro, 1 = Fevereiro, etc.
+        const mesAtual = hoje.getMonth();
         const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate();
 
-        // Lista de feriados (DD/MM)
         const feriados = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"];
 
-        // 1. Monta o cabeçalho (NÚMEROS DOS DIAS)
+        // 1. Monta o cabeçalho (Datas)
         if (cabecalho.cells.length <= 1) {
             for (let d = 1; d <= ultimoDia; d++) {
                 let th = document.createElement('th');
                 th.innerText = d;
                 th.className = 'celula-dia';
 
-                // Cria uma data para verificar o dia da semana
                 let dataVerificar = new Date(anoAtual, mesAtual, d);
-                let diaSemana = dataVerificar.getDay(); // 0 = Domingo, 6 = Sábado
+                let diaSemana = dataVerificar.getDay();
                 let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
 
-                // NOVA LÓGICA: Aplica a classe data-destaque (vermelho vivo no texto)
-                // SE for Domingo OR Sábado OR Feriado
                 if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
-                    th.classList.add('data-destaque'); // <--- ISSO DESTACA SÓ O NÚMERO NO TOPO
+                    th.classList.add('data-destaque');
                 }
-
                 cabecalho.appendChild(th);
             }
         }
 
-        // 2. Monta as linhas dos colaboradores (DADOS DA ESCALA)
-        corpo.innerHTML = ""; // Limpa antes de preencher
+        // 2. Monta as linhas dos colaboradores
+        corpo.innerHTML = ""; 
         for (let mat in escala) {
             let row = document.createElement('tr');
             
-            // Coluna fixa com o Nome do Colaborador
-let tdNome = document.createElement('td');
-tdNome.innerText = escala[mat].nome;
-tdNome.title = escala[mat].nome; // DICA: Isso faz aparecer o nome completo se você passar o mouse em cima
-tdNome.style.textAlign = "left";
-tdNome.style.paddingLeft = "10px";
-row.appendChild(tdNome);
+            // Célula do Nome com Title (mostra o nome completo ao passar o mouse)
+            let tdNome = document.createElement('td');
+            tdNome.innerText = escala[mat].nome;
+            tdNome.title = escala[mat].nome; 
+            tdNome.style.textAlign = "left";
+            tdNome.style.paddingLeft = "10px";
+            row.appendChild(tdNome);
 
-            // Cria as células dos dias para este colaborador
             for (let d = 1; d <= ultimoDia; d++) {
                 let tdDia = document.createElement('td');
                 tdDia.className = 'celula-dia';
                 
-                // --- REMOVI A LÓGICA DE PINTAR O FUNDO DO CORPO DA TABELA ---
-
-                // Verifica se há registro de trabalho neste dia (escala)
                 let registro = escala[mat].dias.find(item => item.dia === d);
                 if (registro) {
-                    tdDia.innerText = registro.posto; // Coloca o número do posto
-                    tdDia.classList.add('dia-trabalhado'); // Pinta o fundo de azul
+                    // Estrutura para Posto e Horário
+                    let htmlInterno = `<span>${registro.posto}</span>`;
+                    
+                    // Só adiciona se o campo 'horario' existir nos dados vindos do .gs
+                    if (registro.horario) {
+                        htmlInterno += `<span class="hora-escala">${registro.horario}</span>`;
+                    }
+                    
+                    tdDia.innerHTML = htmlInterno;
+                    tdDia.classList.add('dia-trabalhado');
                 }
-                
                 row.appendChild(tdDia);
             }
-            corpo.appendChild(row); // Adiciona a linha completa ao corpo da tabela
+            corpo.appendChild(row);
         }
     } catch (e) {
         console.error("Erro ao carregar o calendário:", e);
