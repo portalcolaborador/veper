@@ -566,12 +566,13 @@ async function carregarCalendario() {
         
         // 2. CORREÇÃO CRÍTICA: Usar .forEach porque 'escala' agora é uma Lista (Array)
         escala.forEach(item => {
-			let tdNome = document.createElement('td');
-			tdNome.innerText = item.nome;
-			tdNome.title = item.nome;
-			tdNome.style.textAlign = "left";
-			tdNome.style.paddingLeft = "15px";
-			row.appendChild(tdNome);
+			let row = document.createElement('tr');
+            let tdNome = document.createElement('td');
+            tdNome.innerText = item.nome;
+            tdNome.title = item.nome; // Exibe nome completo ao passar o mouse
+            tdNome.style.textAlign = "left";
+            tdNome.style.paddingLeft = "15px";
+            row.appendChild(tdNome);
 // ...
 
             for (let d = 1; d <= ultimoDia; d++) {
