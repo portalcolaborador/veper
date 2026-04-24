@@ -209,6 +209,22 @@ body {
 
 }
 
+        /* Ajuste para os nomes não quebrarem linha e não deformarem os quadrados */
+#corpoCalendario td:first-child {
+    white-space: nowrap;       /* Impede a quebra de linha */
+    overflow: hidden;          /* Esconde o que sobrar */
+    text-overflow: ellipsis;   /* Adiciona os "..." no final do nome longo */
+    max-width: 200px;          /* Define uma largura máxima para a coluna de nomes */
+    vertical-align: middle;    /* Mantém o texto alinhado ao centro do quadrado */
+}
+
+/* Garante que todas as células da tabela tenham a mesma altura */
+.celula-dia {
+    height: 30px;
+    line-height: 30px;         /* Alinha o texto verticalmente */
+    padding: 0 !important;
+}
+
 
     </style>
 
