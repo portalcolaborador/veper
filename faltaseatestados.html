@@ -13,6 +13,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
 
     <style>
+	
+	/* Coluna de Total em Verde */
+.coluna-total {
+    background-color: rgba(16, 185, 129, 0.15) !important; /* Verde suave */
+    color: #10b981 !important; /* Texto verde esmeralda */
+    font-weight: 800 !important;
+    border-left: 2px solid #10b981 !important;
+}
+
+/* Dias de Final de Semana/Feriado */
+.dia-destaque-vermelho {
+    color: #ef4444 !important; /* Vermelho */
+    font-weight: 900 !important;
+}
 
 body { 
 
@@ -495,69 +509,66 @@ async function carregarCalendario() {
         const cabecalho = document.getElementById('cabecalhoDias');
         
         const hoje = new Date();
-        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+        const ano = hoje.getFullYear();
+        const mes = hoje.getMonth();
+        const ultimoDia = new Date(ano, mes + 1, 0).getDate();
 
-        // 1. Monta o cabeçalho (apenas se estiver vazio)
         if (cabecalho.cells.length <= 1) {
             for (let d = 1; d <= ultimoDia; d++) {
                 let th = document.createElement('th');
                 th.innerText = d;
                 th.className = 'celula-dia';
+                
+                // Identifica se o dia é Sábado (6) ou Domingo (0)
+                let dataVerif = new Date(ano, mes, d);
+                if (dataVerif.getDay() === 0 || dataVerif.getDay() === 6) {
+                    th.classList.add('dia-destaque-vermelho');
+                }
                 cabecalho.appendChild(th);
             }
-            // Adiciona coluna de Total no cabeçalho
             let thT = document.createElement('th');
             thT.innerText = "TOT";
             thT.className = 'celula-dia coluna-total';
             cabecalho.appendChild(thT);
         }
 
-        // 2. Monta as linhas dos colaboradores
         corpo.innerHTML = "";
         for (let mat in escala) {
             let row = document.createElement('tr');
-            
-            // Coluna do Nome
             let tdNome = document.createElement('td');
             tdNome.innerText = escala[mat].nome;
             tdNome.style.textAlign = "left";
             tdNome.style.paddingLeft = "10px";
             row.appendChild(tdNome);
 
-            // Colunas dos Dias
             for (let d = 1; d <= ultimoDia; d++) {
                 let tdDia = document.createElement('td');
                 tdDia.className = 'celula-dia';
                 
+                // Aplica vermelho se for final de semana
+                let dataVerif = new Date(ano, mes, d);
+                if (dataVerif.getDay() === 0 || dataVerif.getDay() === 6) {
+                    tdDia.classList.add('dia-destaque-vermelho');
+                }
+
                 let registro = escala[mat].dias.find(item => item.dia === d);
-                
                 if (registro) {
                     tdDia.innerText = registro.posto;
                     tdDia.classList.add('dia-trabalhado');
-                    
-                    // AQUI ESTÁ O BALÃO (TOOLTIP)
-                    tdDia.title = `📍 Posto: ${registro.posto}${registro.nomePosto ? ' - ' + registro.nomePosto : ''}\n` +
-                                  `⏰ Horário: ${registro.horario || 'Não informado'}\n` +
-                                  `👤 Colaborador: ${escala[mat].nome}`;
+                    tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario}\n👤 Colaborador: ${escala[mat].nome}`;
                 }
-                
                 row.appendChild(tdDia);
             }
 
-            // Coluna do Total de Plantões
             let tdTotal = document.createElement('td');
             tdTotal.className = 'celula-dia coluna-total';
             tdTotal.innerText = escala[mat].total;
             row.appendChild(tdTotal);
 
-            // Importante: usar appendChild em vez de innerHTML += row.outerHTML
             corpo.appendChild(row);
         }
-    } catch (e) {
-        console.error("Erro ao carregar o calendário:", e);
-    }
+    } catch (e) { console.error(e); }
 }
-
 
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwXCAIp77nB9wVVBm8me9fqoLNHrY2vZi5UCwrrqrNaANANrEzDWRro4YIvCIfvfY3F/exec";
