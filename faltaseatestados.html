@@ -556,11 +556,12 @@ async function carregarCalendario() {
             let row = document.createElement('tr');
             
             // Coluna fixa com o Nome do Colaborador
-            let tdNome = document.createElement('td');
-            tdNome.innerText = escala[mat].nome;
-            tdNome.style.textAlign = "left";
-            tdNome.style.paddingLeft = "10px";
-            row.appendChild(tdNome);
+let tdNome = document.createElement('td');
+tdNome.innerText = escala[mat].nome;
+tdNome.title = escala[mat].nome; // DICA: Isso faz aparecer o nome completo se você passar o mouse em cima
+tdNome.style.textAlign = "left";
+tdNome.style.paddingLeft = "10px";
+row.appendChild(tdNome);
 
             // Cria as células dos dias para este colaborador
             for (let d = 1; d <= ultimoDia; d++) {
