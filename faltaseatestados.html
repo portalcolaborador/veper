@@ -494,6 +494,8 @@ body {
 
 
 
+/* Localize a função carregarCalendario antiga e substitua por esta completa: */
+
 async function carregarCalendario() {
     try {
         const response = await fetch(`${API_URL}?acao=get_calendario`);
@@ -501,69 +503,66 @@ async function carregarCalendario() {
         const corpo = document.getElementById('corpoCalendario');
         const cabecalho = document.getElementById('cabecalhoDias');
         
+        // Pega a data de hoje para basear o mês
         const hoje = new Date();
         const anoAtual = hoje.getFullYear();
-        const mesAtual = hoje.getMonth();
+        const mesAtual = hoje.getMonth(); // 0 = Janeiro, 1 = Fevereiro, etc.
         const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate();
 
-        // Lista de feriados (Exemplo: 01/05, 07/09, 12/10, 02/11, 15/11, 25/12)
-        // Adicione os feriados de Foz do Iguaçu aqui se desejar
-        const feriados = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "25/12"];
+        // Lista de feriados (DD/MM)
+        const feriados = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"];
 
-        // 1. Monta o cabeçalho
+        // 1. Monta o cabeçalho (NÚMEROS DOS DIAS)
         if (cabecalho.cells.length <= 1) {
             for (let d = 1; d <= ultimoDia; d++) {
                 let th = document.createElement('th');
                 th.innerText = d;
                 th.className = 'celula-dia';
 
-                // Lógica de Sábado (6) e Domingo (0)
+                // Cria uma data para verificar o dia da semana
                 let dataVerificar = new Date(anoAtual, mesAtual, d);
-                let diaSemana = dataVerificar.getDay();
+                let diaSemana = dataVerificar.getDay(); // 0 = Domingo, 6 = Sábado
                 let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
 
+                // NOVA LÓGICA: Aplica a classe data-destaque (vermelho vivo no texto)
+                // SE for Domingo OR Sábado OR Feriado
                 if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
-                    th.classList.add('dia-feriado');
+                    th.classList.add('data-destaque'); // <--- ISSO DESTACA SÓ O NÚMERO NO TOPO
                 }
 
                 cabecalho.appendChild(th);
             }
         }
 
-        // 2. Monta as linhas
-        corpo.innerHTML = "";
+        // 2. Monta as linhas dos colaboradores (DADOS DA ESCALA)
+        corpo.innerHTML = ""; // Limpa antes de preencher
         for (let mat in escala) {
             let row = document.createElement('tr');
             
+            // Coluna fixa com o Nome do Colaborador
             let tdNome = document.createElement('td');
             tdNome.innerText = escala[mat].nome;
             tdNome.style.textAlign = "left";
             tdNome.style.paddingLeft = "10px";
             row.appendChild(tdNome);
 
+            // Cria as células dos dias para este colaborador
             for (let d = 1; d <= ultimoDia; d++) {
                 let tdDia = document.createElement('td');
                 tdDia.className = 'celula-dia';
                 
-                // Aplicar fundo vermelho na célula da linha também
-                let dataVerificar = new Date(anoAtual, mesAtual, d);
-                let diaSemana = dataVerificar.getDay();
-                let diaFormatado = d.toString().padStart(2, '0') + '/' + (mesAtual + 1).toString().padStart(2, '0');
+                // --- REMOVI A LÓGICA DE PINTAR O FUNDO DO CORPO DA TABELA ---
 
-                if (diaSemana === 0 || diaSemana === 6 || feriados.includes(diaFormatado)) {
-                    tdDia.classList.add('dia-feriado');
-                }
-
+                // Verifica se há registro de trabalho neste dia (escala)
                 let registro = escala[mat].dias.find(item => item.dia === d);
                 if (registro) {
-                    tdDia.innerText = registro.posto;
-                    tdDia.classList.add('dia-trabalhado'); 
-                    // O azul do 'dia-trabalhado' vai sobressair ao vermelho se o cara trabalhar
+                    tdDia.innerText = registro.posto; // Coloca o número do posto
+                    tdDia.classList.add('dia-trabalhado'); // Pinta o fundo de azul
                 }
                 
                 row.appendChild(tdDia);
             }
-            corpo.appendChild(row);
+            corpo.appendChild(row); // Adiciona a linha completa ao corpo da tabela
         }
     } catch (e) {
         console.error("Erro ao carregar o calendário:", e);
