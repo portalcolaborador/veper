@@ -171,12 +171,12 @@ body {
     background-color: #007bff !important;
     color: white !important;
     display: flex !important;
-    flex-direction: column;    /* Posto em cima, Hora embaixo */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    line-height: 1.1;          /* Espaçamento entre linhas mais justo */
-    height: 100%;              /* Ocupa todo o espaço da célula */
+    line-height: 1 !important; 
+    height: 100%;
 }
         /* Estilo para Sábados, Domingos e Feriados */
 .data-destaque {
@@ -189,18 +189,17 @@ body {
 
 /* Ajuste para que todos os quadrados sejam IDÊNTICOS e comportem o horário */
 .celula-dia {
-    width: 70px !important;    /* Largura fixa para caber o texto */
-    min-width: 70px !important;
-    height: 48px !important;   /* Altura fixa para duas linhas */
+    width: 32px !important;    
+    min-width: 32px !important;
+    height: 38px !important;   /* Altura levemente maior para as duas linhas */
     padding: 0 !important;
-    font-size: 10px !important;
+    font-size: 9px !important;  /* Fonte pequena para caber o texto */
     text-align: center;
     vertical-align: middle;
     border: 1px solid var(--border);
     box-sizing: border-box;
-    overflow: hidden;          /* Não deixa o texto vazar do quadrado */
+    overflow: hidden;
 }
-
         /* Ajuste para os nomes não quebrarem linha e não deformarem os quadrados */
 #corpoCalendario td:first-child {
     white-space: nowrap;       /* Impede a quebra de linha */
@@ -213,10 +212,11 @@ body {
 
         /* Estilo para o horário ficar menor e discreto */
 .hora-escala {
-    font-size: 8px !important;
+    font-size: 7px !important; /* Horário bem pequeno */
     font-weight: normal !important;
-    margin-top: 2px;
+    margin-top: 1px;
     display: block;
+    letter-spacing: -0.5px; /* Comprime as letras do horário */
 }
 
 
