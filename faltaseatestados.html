@@ -488,111 +488,74 @@ body {
 
 
 async function carregarCalendario() {
-
     try {
-
         const response = await fetch(`${API_URL}?acao=get_calendario`);
-
         const escala = await response.json();
-
         const corpo = document.getElementById('corpoCalendario');
-
         const cabecalho = document.getElementById('cabecalhoDias');
-
         
-
-        // Descobre quantos dias tem o mês atual
-
         const hoje = new Date();
-
         const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
 
-
-
-        // 1. Monta o cabeçalho de 1 a 31 (apenas se estiver vazio)
-
+        // 1. Monta o cabeçalho (apenas se estiver vazio)
         if (cabecalho.cells.length <= 1) {
-
             for (let d = 1; d <= ultimoDia; d++) {
-
                 let th = document.createElement('th');
-
                 th.innerText = d;
-
                 th.className = 'celula-dia';
-
                 cabecalho.appendChild(th);
-
             }
-
+            // Adiciona coluna de Total no cabeçalho
+            let thT = document.createElement('th');
+            thT.innerText = "TOT";
+            thT.className = 'celula-dia coluna-total';
+            cabecalho.appendChild(thT);
         }
-
-
 
         // 2. Monta as linhas dos colaboradores
-
         corpo.innerHTML = "";
-
         for (let mat in escala) {
-
             let row = document.createElement('tr');
-
             
-
             // Coluna do Nome
-
             let tdNome = document.createElement('td');
-
             tdNome.innerText = escala[mat].nome;
-
             tdNome.style.textAlign = "left";
-
             tdNome.style.paddingLeft = "10px";
-
             row.appendChild(tdNome);
 
-
-
             // Colunas dos Dias
-
             for (let d = 1; d <= ultimoDia; d++) {
-
                 let tdDia = document.createElement('td');
-
                 tdDia.className = 'celula-dia';
-
                 
-
-                // Verifica se o colaborador trabalhou neste dia
-
                 let registro = escala[mat].dias.find(item => item.dia === d);
-
                 
-
                 if (registro) {
-
-                    tdDia.innerText = registro.posto; // Coloca o número do posto
-
-                    tdDia.classList.add('dia-trabalhado'); // Pinta de azul
-
+                    tdDia.innerText = registro.posto;
+                    tdDia.classList.add('dia-trabalhado');
+                    
+                    // AQUI ESTÁ O BALÃO (TOOLTIP)
+                    tdDia.title = `📍 Posto: ${registro.posto}${registro.nomePosto ? ' - ' + registro.nomePosto : ''}\n` +
+                                  `⏰ Horário: ${registro.horario || 'Não informado'}\n` +
+                                  `👤 Colaborador: ${escala[mat].nome}`;
                 }
-
                 
-
                 row.appendChild(tdDia);
-
             }
 
-            corpo.innerHTML += row.outerHTML;
+            // Coluna do Total de Plantões
+            let tdTotal = document.createElement('td');
+            tdTotal.className = 'celula-dia coluna-total';
+            tdTotal.innerText = escala[mat].total;
+            row.appendChild(tdTotal);
 
+            // Importante: usar appendChild em vez de innerHTML += row.outerHTML
+            corpo.appendChild(row);
         }
-
     } catch (e) {
-
         console.error("Erro ao carregar o calendário:", e);
-
     }
-
 }
 
 
