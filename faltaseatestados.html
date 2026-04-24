@@ -15,7 +15,7 @@
         body { 
             display: none; font-family: 'Geist', sans-serif; background-color: var(--bg-page); 
             color: var(--text-main); margin: 0; padding: 15px; flex-direction: column; 
-            align-items: center; min-height: 100vh; 
+            align-items: center; min-height: 100vh;
         }
 
         .container, .mirror-container { 
@@ -68,31 +68,17 @@
         th { background: var(--bg-input); padding: 12px; border-bottom: 2px solid var(--border); color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
 
-        /* ESCALA COMPACTA */
         .celula-dia {
             width: 32px !important; min-width: 32px !important; height: 32px !important;
             padding: 0 !important; font-size: 11px !important; text-align: center;
             vertical-align: middle; border: 1px solid var(--border); box-sizing: border-box; overflow: hidden;
         }
 
-        .dia-trabalhado {
-            background-color: #007bff !important; color: white !important;
-            font-weight: bold; cursor: help;
-        }
-
-        .coluna-total {
-            background-color: rgba(16, 185, 129, 0.15) !important;
-            color: var(--success) !important;
-            font-weight: 800 !important;
-            border-left: 2px solid var(--success) !important;
-        }
-
+        .dia-trabalhado { background-color: #007bff !important; color: white !important; font-weight: bold; cursor: help; }
+        .coluna-total { background-color: rgba(16, 185, 129, 0.15) !important; color: var(--success) !important; font-weight: 800 !important; border-left: 2px solid var(--success) !important; }
         .data-destaque { color: #FF0000 !important; font-weight: 900 !important; }
 
-        #corpoCalendario td:first-child {
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; vertical-align: middle;
-        }
-
+        #corpoCalendario td:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; vertical-align: middle; }
         #overlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; background: rgba(2, 4, 10, 0.9); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .loader { width: 35px; height: 35px; border: 4px solid var(--border); border-bottom-color: var(--primary); border-radius: 50%; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
@@ -214,36 +200,6 @@
 <datalist id="lPostos"></datalist>
 
 <script>
-
-    // Adicione isto dentro da sua tag <script> no HTML
-document.getElementById('nomeCobertura').addEventListener('blur', async function() {
-    const nome = this.value.toUpperCase().trim();
-    const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === nome);
-    
-    if (achado) {
-        document.getElementById('matCobertura').value = achado.mat;
-        
-        // Dispara a verificação no Servidor (GS)
-        const data = document.getElementById('dataPlantao').value;
-        const hora = document.getElementById('horaEnt').value;
-        
-        const response = await fetch(`${API_URL}?acao=check_compliance&mat=${achado.mat}&data=${data}&hora=${hora}`);
-        const status = await response.json();
-        
-        // Atualiza os cards visuais no site
-        const cardRec = document.getElementById('cardReciclagem');
-        const cardFolga = document.getElementById('cardFolga');
-        
-        cardRec.style.display = 'flex';
-        cardRec.innerText = `RECICLAGEM: ${status.reciclagem.mensagem}`;
-        cardRec.className = `status-box ${status.reciclagem.ok ? 'bg-ok' : 'bg-error'}`;
-        
-        cardFolga.style.display = 'flex';
-        cardFolga.innerText = `FOLGA 36H: ${status.folga36h.mensagem}`;
-        cardFolga.className = `status-box ${status.folga36h.ok ? 'bg-ok' : 'bg-error'}`;
-    }
-});
-    
     const API_URL = "https://script.google.com/macros/s/AKfycbwXCAIp77nB9wVVBm8me9fqoLNHrY2vZi5UCwrrqrNaANANrEzDWRro4YIvCIfvfY3F/exec";
     let userLogado = JSON.parse(localStorage.getItem('veper_user'));
     let lastKey = "";
@@ -259,10 +215,38 @@ document.getElementById('nomeCobertura').addEventListener('blur', async function
         }
     })();
 
+    // VERIFICAÇÃO AUTOMÁTICA DE RECICLAGEM E FOLGA
+    document.getElementById('nomeCobertura').addEventListener('blur', async function() {
+        const nome = this.value.toUpperCase().trim();
+        const achado = userLogado.colaboradores.find(c => c.nome.toUpperCase() === nome);
+        
+        if (achado) {
+            document.getElementById('matCobertura').value = achado.mat;
+            const data = document.getElementById('dataPlantao').value;
+            const hora = document.getElementById('horaEnt').value;
+            
+            if(!data || !hora) return;
+
+            const response = await fetch(`${API_URL}?acao=check_compliance&mat=${achado.mat}&data=${data}&hora=${hora}`);
+            const status = await response.json();
+            
+            const cardRec = document.getElementById('cardReciclagem');
+            const cardFolga = document.getElementById('cardFolga');
+            
+            cardRec.style.display = 'flex';
+            cardRec.innerText = `RECICLAGEM: ${status.reciclagem.mensagem}`;
+            cardRec.className = `status-box ${status.reciclagem.ok ? 'bg-ok' : 'bg-error'}`;
+            
+            cardFolga.style.display = 'flex';
+            cardFolga.innerText = `FOLGA 36H: ${status.folga36h.mensagem}`;
+            cardFolga.className = `status-box ${status.folga36h.ok ? 'bg-ok' : 'bg-error'}`;
+        }
+    });
+
     async function carregarCalendario() {
         try {
             const response = await fetch(`${API_URL}?acao=get_calendario`);
-            const escala = await response.json();
+            const escala = await response.json(); // GS agora envia como Lista (Array)
             const corpo = document.getElementById('corpoCalendario');
             const cabecalho = document.getElementById('cabecalhoDias');
             
@@ -291,19 +275,20 @@ document.getElementById('nomeCobertura').addEventListener('blur', async function
                 cabecalho.appendChild(thTotal);
             }
 
-            corpo.innerHTML = ""; 
-            for (let mat in escala) {
+            corpo.innerHTML = "";
+            // AJUSTADO PARA LER LISTA (ARRAY) DO GS
+            escala.forEach(item => {
                 let row = document.createElement('tr');
                 let tdNome = document.createElement('td');
-                tdNome.innerText = escala[mat].nome;
-                tdNome.title = escala[mat].nome;
+                tdNome.innerText = item.nome;
+                tdNome.title = item.nome;
                 row.appendChild(tdNome);
 
                 let contador = 0;
                 for (let d = 1; d <= ultimoDia; d++) {
                     let tdDia = document.createElement('td');
                     tdDia.className = 'celula-dia';
-                    let registro = escala[mat].dias.find(item => item.dia === d);
+                    let registro = item.dias.find(reg => reg.dia === d);
                     if (registro) {
                         contador++;
                         tdDia.innerText = registro.posto;
@@ -317,7 +302,7 @@ document.getElementById('nomeCobertura').addEventListener('blur', async function
                 tdTotal.innerText = contador;
                 row.appendChild(tdTotal);
                 corpo.appendChild(row);
-            }
+            });
         } catch (e) { console.error("Erro no calendário:", e); }
     }
 
@@ -326,7 +311,7 @@ document.getElementById('nomeCobertura').addEventListener('blur', async function
             const response = await fetch(`${API_URL}?acao=get_historico`);
             const dados = await response.json();
             const corpo = document.getElementById('corpoTabela');
-            corpo.innerHTML = ""; 
+            corpo.innerHTML = "";
             dados.forEach(item => {
                 corpo.innerHTML += `<tr>
                     <td>${item.data}</td><td>${item.nome}</td><td>${item.posto}</td>
@@ -397,7 +382,8 @@ document.getElementById('nomeCobertura').addEventListener('blur', async function
             const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
             const res = await r.json();
             if (res.status === "sucesso") { 
-                alert("✅ Sucesso!"); document.getElementById('formFalta').reset();
+                alert("✅ Sucesso!");
+                document.getElementById('formFalta').reset();
                 carregarHistoricoRealtime(); carregarCalendario();
             } else { alert("Erro: " + res.mensagem); }
         } catch (e) { alert("Erro de conexão."); }
