@@ -14,6 +14,37 @@
 
     <style>
 	
+	/* 1. Trava a largura da tabela e das colunas */
+#tabelaEscala {
+    table-layout: fixed; 
+    width: auto; 
+    border-collapse: collapse;
+}
+
+/* 2. Formata a coluna dos NOMES para usar reticências (...) */
+#corpoCalendario td:first-child, 
+#cabecalhoDias th:first-child {
+    width: 160px !important;  /* Largura fixa para a coluna do nome */
+    max-width: 160px;
+    white-space: nowrap;      /* Não deixa o nome pular linha */
+    overflow: hidden;         /* Esconde o excesso */
+    text-overflow: ellipsis;  /* Coloca os pontinhos ... */
+    font-size: 11px;
+    padding-left: 10px !important;
+    text-align: left;
+    border-right: 2px solid var(--border);
+}
+
+/* 3. Mantém os DIAS pequenos e perfeitamente alinhados */
+.celula-dia {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px;
+    text-align: center;
+    padding: 0 !important;
+}
+	
 	/* Coluna de Total em Verde */
 .coluna-total {
     background-color: rgba(16, 185, 129, 0.15) !important; /* Verde suave */
@@ -535,12 +566,10 @@ async function carregarCalendario() {
         
         // 2. CORREÇÃO CRÍTICA: Usar .forEach porque 'escala' agora é uma Lista (Array)
         escala.forEach(item => {
-            let row = document.createElement('tr');
             let tdNome = document.createElement('td');
-            tdNome.innerText = item.nome;
-            tdNome.style.textAlign = "left";
-            tdNome.style.paddingLeft = "15px";
-            row.appendChild(tdNome);
+			tdNome.innerText = item.nome;
+			tdNome.title = item.nome; // <--- ESTA LINHA É FUNDAMENTAL
+			row.appendChild(tdNome);
 
             for (let d = 1; d <= ultimoDia; d++) {
                 let tdDia = document.createElement('td');
