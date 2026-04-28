@@ -603,10 +603,33 @@ async function carregarCalendario() {
                 // Busca o plantão do dia d
                 let registro = item.dias.find(p => p.dia === d);
                 if (registro) {
-                    tdDia.innerText = registro.posto;
+                    // 1. Identifica a hora de início para separar Diurno de Noturno
+                    let horaInicio = 0;
+                    if (registro.horario) {
+                        horaInicio = parseInt(registro.horario.split(':')[0]); 
+                    }
+
+                    // 2. Verifica se o dia do calendário é par ou ímpar
+                    let ehDiaImpar = (d % 2 !== 0);
+
+                    // 3. Define a letra baseada no seu critério: Ímpar (A/C) e Par (B/D)
+                    let letraGrupo = "";
+                    
+                    if (horaInicio >= 5 && horaInicio < 18) {
+                        // DIURNO
+                        letraGrupo = ehDiaImpar ? "A" : "B";
+                    } else {
+                        // NOTURNO
+                        letraGrupo = ehDiaImpar ? "C" : "D";
+                    }
+
+                    // 4. Preenche a célula com o formato solicitado: Grupo-Posto
+                    tdDia.innerText = letraGrupo + "-" + registro.posto;
+                    
                     tdDia.classList.add('dia-trabalhado');
                     tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario || '---'}\n👤 Colaborador: ${item.nome}`;
                 }
+                // Fecha o bloco corretamente antes de adicionar à linha
                 row.appendChild(tdDia);
             }
 
