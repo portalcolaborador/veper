@@ -214,18 +214,17 @@ body {
 /* Estilo para destacar o dia trabalhado */
 
 .dia-trabalhado {
-
-    background-color: #007bff !important; /* Azul padrão */
-
-    color: white !important;
-
     font-weight: bold;
-
     text-align: center;
-
     font-size: 11px;
-
+    border-radius: 2px;
 }
+
+/* Cores por Grupo */
+.bg-grupo-a { background-color: #ef4444 !important; color: white !important; } /* Vermelho */
+.bg-grupo-b { background-color: #facc15 !important; color: black !important; } /* Amarelo */
+.bg-grupo-c { background-color: #7dd3fc !important; color: black !important; } /* Azul Claro */
+.bg-grupo-d { background-color: #86efac !important; color: black !important; } /* Verde Claro */
 
 
 
@@ -603,16 +602,14 @@ async function carregarCalendario() {
                 // Busca o plantão do dia d
                 let registro = item.dias.find(p => p.dia === d);
                 if (registro) {
-                    // 1. Identifica a hora de início para separar Diurno de Noturno
+                    // A. Identifica a hora de entrada para separar Diurno de Noturno
                     let horaInicio = 0;
                     if (registro.horario) {
                         horaInicio = parseInt(registro.horario.split(':')[0]); 
                     }
 
-                    // 2. Verifica se o dia do calendário é par ou ímpar
+                    // B. Regra de Abril/2026: Ímpar (A/C) e Par (B/D)
                     let ehDiaImpar = (d % 2 !== 0);
-
-                    // 3. Define a letra baseada no seu critério: Ímpar (A/C) e Par (B/D)
                     let letraGrupo = "";
                     
                     if (horaInicio >= 5 && horaInicio < 18) {
@@ -623,11 +620,17 @@ async function carregarCalendario() {
                         letraGrupo = ehDiaImpar ? "C" : "D";
                     }
 
-                    // 4. Preenche a célula com o formato solicitado: Grupo-Posto
+                    // C. Preenche o texto final (Ex: A-30)
                     tdDia.innerText = letraGrupo + "-" + registro.posto;
                     
+                    // D. Adiciona as classes de estilo e a cor específica do grupo
                     tdDia.classList.add('dia-trabalhado');
-                    tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario || '---'}\n👤 Colaborador: ${item.nome}`;
+                    if (letraGrupo === "A") tdDia.classList.add('bg-grupo-a');
+                    else if (letraGrupo === "B") tdDia.classList.add('bg-grupo-b');
+                    else if (letraGrupo === "C") tdDia.classList.add('bg-grupo-c');
+                    else if (letraGrupo === "D") tdDia.classList.add('bg-grupo-d');
+
+                    tdDia.title = `📍 Posto: ${registro.posto}\n⏰ Horário: ${registro.horario}\n👤 Colaborador: ${item.nome}`;
                 }
                 // Fecha o bloco corretamente antes de adicionar à linha
                 row.appendChild(tdDia);
