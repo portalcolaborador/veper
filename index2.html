@@ -128,6 +128,23 @@
 </head>
 <body>
 
+<div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:999999; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <h2 style="margin-bottom:20px; color:#fff;">ACESSO RESTRITO</h2>
+    <input type="password" id="senha-acesso" placeholder="Digite a senha..." style="padding:10px; width:200px; border-radius:5px;">
+    <button onclick="verificarSenha()" style="margin-top:10px; padding:10px 20px; cursor:pointer;">ENTRAR</button>
+</div>
+
+<script>
+    function verificarSenha() {
+        const senhaDigitada = document.getElementById('senha-acesso').value;
+        if (senhaDigitada === "2026") { 
+            document.getElementById('login-overlay').style.display = 'none';
+        } else {
+            alert("Senha incorreta!");
+        }
+    }
+</script>
+
     <div class="header-painel">
         <div class="logo-area">VEPER SEGURANÇA</div>
         <h1>Divisão de Segurança Externa</h1>
@@ -151,6 +168,19 @@
     </div>
 
     <div id="global-tooltip"></div>
+	
+	<script>
+    // Bloquear botão direito do mouse
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Bloquear atalhos de teclado (F12, Ctrl+Shift+I, Ctrl+U)
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123) return false; // F12
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+    }
+</script>
 
     <script>
         const URL_API = "https://script.google.com/macros/s/AKfycbyfMiZompnkaTl7qxAPvvNcAiP3ZmUE-KyB_WVh7K5kJnojU4tGITf8jK-2snM94RfLqw/exec";
@@ -247,7 +277,7 @@
             const tagSuperior = document.createElement('div');
             tagSuperior.style.position = 'absolute'; tagSuperior.style.top = '0'; tagSuperior.style.left = '0'; tagSuperior.style.right = '0';
             tagSuperior.style.background = 'rgba(0, 0, 0, 0.75)'; tagSuperior.style.display = 'flex'; tagSuperior.style.justifyContent = 'space-between';
-            tagSuperior.style.padding = '1px 3px'; tagSuperior.style.fontSize = '8px'; tagSuperior.style.fontWeight = 'bold';
+            tagSuperior.style.padding = '1px 3px'; tagSuperior.style.fontSize = '14px'; tagSuperior.style.fontWeight = 'bold';
             tagSuperior.style.color = '#fff'; tagSuperior.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
 
             const spanPosto = document.createElement('span');
