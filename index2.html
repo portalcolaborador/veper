@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carômetro Operacional - Segurança Externa</title>
+    <style>
+        :root {
+            --bg-color: #1e293b;
+            --panel-bg: #0f172a;
+            --card-bg: #ffffff;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --border-color: #334155;
+            --cor-grupo-a: #dc2626;
+            --cor-grupo-b: #eab308;
+            --cor-grupo-c: #2563eb;
+            --cor-grupo-d: #16a34a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            padding: 15px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header-painel {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--panel-bg); padding: 12px 25px;
+            border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;
+        }
+
+        .header-painel h1 { font-size: 22px; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .logo-area { font-weight: bold; font-size: 16px; color: #94a3b8; letter-spacing: 2px; }
+
+        .quadro-principal { display: grid; grid-template-columns: 1fr; flex: 1; min-height: 0; }
+        .grade-grupos {
+            display: grid; grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr; gap: 12px;
+            transition: grid-template-columns 0.4s ease; height: 100%; min-height: 0;
+        }
+
+        .secao-bloco {
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 10px; display: flex; flex-direction: column;
+            min-height: 0; max-height: 100%; overflow: hidden !important;
+        }
+
+        .titulo-secao {
+            text-align: center; font-weight: 700; padding: 6px; margin-bottom: 10px;
+            border-radius: 4px; text-transform: uppercase; font-size: 13px; color: #fff;
+            background: #475569; white-space: nowrap;
+        }
+
+        .bg-grupo-a { background-color: var(--cor-grupo-a); }
+        .bg-grupo-b { background-color: var(--cor-grupo-b); color: #000; }
+        .bg-grupo-c { background-color: var(--cor-grupo-c); }
+        .bg-grupo-d { background-color: var(--cor-grupo-d); }
+
+        .zona-fotos {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+            grid-auto-rows: 106px; gap: 10px; align-content: flex-start; flex: 1;
+            overflow-y: auto !important; overflow-x: hidden !important;
+        }
+        .zona-fotos::-webkit-scrollbar { width: 0px; }
+        
+        .area-status-inferior { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .linha-status { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: center; }
+
+        .label-status {
+            background: #334155; color: #fff; font-weight: bold; text-transform: uppercase;
+            font-size: 11px; padding: 8px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color);
+        }
+
+        .fotos-status-linha {
+            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 6px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+            grid-auto-rows: 66px; gap: 8px; min-height: 50px; max-height: 150px; align-items: center; overflow-y: auto !important;
+        }
+        .fotos-status-linha::-webkit-scrollbar { width: 0px; }
+
+        .vigilante-container { width: 84px; height: 106px; }
+        .fotos-status-linha .vigilante-container { width: 52px !important; height: 66px !important; }
+        .fotos-status-linha .vigilante-nome-tag { font-size: 7.5px !important; padding: 1px 0 !important; }
+        .fotos-status-linha .vigilante-card div[style*="position: absolute"] { padding: 0px 2px !important; }
+        .fotos-status-linha .vigilante-card div[style*="position: absolute"] span { font-size: 7px !important; }
+
+        .vigilante-card {
+            width: 100%; height: 100%; border: 2px solid #64748b; border-radius: 6px; cursor: pointer;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            background-color: #334155; position: relative; z-index: 1; filter: grayscale(100%);
+            opacity: 0.4; transition: border-color 0.15s, filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        .borda-supervisor { border-color: #eab308 !important; box-shadow: inset 0 0 4px #eab308; }
+        .borda-intermitente { border-color: #dc2626 !important; box-shadow: inset 0 0 4px #dc2626; }
+        .borda-vigilante { border-color: #64748b; }
+        .vigilante-card:hover { border-color: #fff !important; z-index: 10; }
+
+        .vigilante-nome-tag {
+            position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.75);
+            color: #fff; font-size: 9px; font-weight: 600; text-align: center; padding: 2px 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 4px 4px;
+        }
+
+        .grupo-ativo .vigilante-card, .intermitente-ativo-hoje { filter: grayscale(0%) !important; opacity: 1 !important; }
+
+        #global-tooltip {
+            position: fixed; display: none; width: 420px; background-color: #ffffff; color: var(--text-dark);
+            border: 2px solid #64748b; border-radius: 8px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 99999; pointer-events: none;
+        }
+        .tooltip-estrutura { display: flex; gap: 15px; align-items: flex-start; }
+        .tooltip-foto-container { width: 150px; height: 190px; border-radius: 6px; border: 2px solid #cbd5e1; background-size: cover; background-position: center; background-color: #e2e8f0; flex-shrink: 0; }
+        .tooltip-dados { flex: 1; display: flex; flex-direction: column; }
+        .tooltip-header { font-weight: bold; font-size: 14px; border-bottom: 2px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px; color: #0f172a; text-transform: uppercase; }
+        .tooltip-linha { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; line-height: 1.2; }
+        .tooltip-linha span:first-child { color: #64748b; font-weight: 600; padding-right: 5px; }
+        .tooltip-linha span:last-child { color: #0f172a; font-weight: 700; text-align: right; word-break: break-word; }
+        .posto-destaque { background: #f1f5f9; padding: 5px 8px; border-radius: 4px; margin-top: 6px; border-left: 3px solid #2563eb; font-size: 11px; font-weight: bold; line-height: 1.3; }
+        .status-alerta { color: #dc2626 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header-painel">
+        <div class="logo-area">VEPER SEGURANÇA</div>
+        <h1>Divisão de Segurança Externa</h1>
+        <div id="data-atual" style="font-weight: 600; color: #cbd5e1;"></div>
+    </div>
+
+    <div class="quadro-principal">
+        <div class="grade-grupos" id="grade-operacional">
+            <div class="secao-bloco" id="bloco-grupo-a"><div class="titulo-secao bg-grupo-a">Grupo A</div><div id="container-grupo-a" class="zona-fotos"></div></div>
+            <div class="secao-bloco" id="bloco-grupo-b"><div class="titulo-secao bg-grupo-b">Grupo B</div><div id="container-grupo-b" class="zona-fotos"></div></div>
+            <div class="secao-bloco" id="bloco-grupo-c"><div class="titulo-secao bg-grupo-c">Grupo C</div><div id="container-grupo-c" class="zona-fotos"></div></div>
+            <div class="secao-bloco" id="bloco-grupo-d"><div class="titulo-secao bg-grupo-d">Grupo D</div><div id="container-grupo-d" class="zona-fotos"></div></div>
+        </div>
+    </div>
+
+    <div class="area-status-inferior">
+        <div class="linha-status"><div class="label-status">Reciclagem</div><div id="container-reciclagem" class="fotos-status-linha"></div></div>
+        <div class="linha-status"><div class="label-status">Atestado</div><div id="container-atestado" class="fotos-status-linha"></div></div>
+        <div class="linha-status"><div class="label-status">Férias</div><div id="container-ferias" class="fotos-status-linha"></div></div>
+        <div class="linha-status"><div class="label-status">Intermitentes</div><div id="container-intermitentes" class="fotos-status-linha"></div></div>
+    </div>
+
+    <div id="global-tooltip"></div>
+
+    <script>
+        const URL_API = "https://script.google.com/macros/s/AKfycbyfMiZompnkaTl7qxAPvvNcAiP3ZmUE-KyB_WVh7K5kJnojU4tGITf8jK-2snM94RfLqw/exec";
+        const tooltipGlobal = document.getElementById('global-tooltip');
+        const grade = document.getElementById('grade-operacional');
+        const blocos = { 'bloco-grupo-a': 0, 'bloco-grupo-b': 1, 'bloco-grupo-c': 2, 'bloco-grupo-d': 3 };
+        let grupoDeServiçoAtual = "GRUPO A";
+
+        function calcularGrupoDeServico() {
+            const agora = new Date(); const hora = agora.getHours();
+            const dataRef = new Date(2026, 4, 21, 0, 0, 0);
+            const dataHojeZerada = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
+            const diferencaTempo = dataHojeZerada.getTime() - dataRef.getTime();
+            const diasCorridos = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+
+            let grupoDefinido = (diasCorridos % 2 === 0) ? ((hora >= 6 && hora < 18) ? "GRUPO A" : "GRUPO C") : ((hora >= 6 && hora < 18) ? "GRUPO B" : "GRUPO D");
+            grupoDeServiçoAtual = grupoDefinido;
+            atualizarLayoutSanfona(grupoDefinido);
+        }
+
+        function atualizarLayoutSanfona(nomeGrupo) {
+            let idBlocoAlvo = "bloco-grupo-a";
+            if (nomeGrupo === "GRUPO B") idBlocoAlvo = "bloco-grupo-b";
+            if (nomeGrupo === "GRUPO C") idBlocoAlvo = "bloco-grupo-c";
+            if (nomeGrupo === "GRUPO D") idBlocoAlvo = "bloco-grupo-d";
+
+            let tamanhos = [0.5, 0.5, 0.5, 0.5]; tamanhos[blocos[idBlocoAlvo]] = 2.5;
+            grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
+            Object.keys(blocos).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
+            document.getElementById(idBlocoAlvo).classList.add('grupo-ativo');
+            ajustarDestaqueIntermitentes();
+        }
+
+
+        function converterLinkDrive(url) {
+            if (!url) return 'https://via.placeholder.com/74x94/334155/FFFFFF?text=?';
+            const matchId = url.match(/\/d\/([a-zA-Z0-9-_]+)/) || url.match(/id=([a-zA-Z0-9-_]+)/);
+            if (matchId && matchId[1]) {
+                let idArquivo = matchId[1];
+                return `https://drive.google.com/thumbnail?id=${idArquivo}&sz=w200-h250`;
+            }
+            return url;
+        }
+		
+        function aplicarImagemFundo(url, elemento, tentativasRestantes = 3) {
+            if (!url || url.includes('via.placeholder.com')) {
+                elemento.style.backgroundImage = `url('${url}')`;
+                return;
+            }
+
+            const img = new Image();
+            
+            img.onload = function() {
+                elemento.style.backgroundImage = `url('${url}')`;
+            };
+            
+            img.onerror = function() {
+                if (tentativasRestantes > 0) {
+                    setTimeout(() => aplicarImagemFundo(url, elemento, tentativasRestantes - 1), 800);
+                } else {
+                    elemento.style.backgroundImage = `url('https://via.placeholder.com/74x94/334155/FFFFFF?text=Erro')`;
+                }
+            };
+            
+            img.src = url;
+        }
+
+        function limparTodosOsContainers() {
+            Object.keys(blocos).forEach(b => document.getElementById(b.replace('bloco-', 'container-')).innerHTML = '');
+            ['container-reciclagem', 'container-atestado', 'container-ferias', 'container-intermitentes'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.innerHTML = '';
+            });
+        }
+
+        function adicionarVigilanteNaTela(vigilante, idContainer) {
+            const container = document.getElementById(idContainer);
+            if (!container) return;
+
+            const isAfastadoContainer = idContainer.includes('reciclagem') || idContainer.includes('atestado') || idContainer.includes('ferias');
+            const wrapper = document.createElement('div'); wrapper.className = 'vigilante-container';
+            const card = document.createElement('div'); card.className = 'vigilante-card';
+            
+            const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
+            if (cargo === "SUPERVISOR OPERACIONAL" || cargo === "SUPERVISOR ADMINISTRATIVO" || cargo === "COORDENADOR") card.classList.add('borda-supervisor');
+            else if (cargo === "VIGILANTE - INTERMITENTE" || cargo.includes("INTERMITENTE")) card.classList.add('borda-intermitente');
+            else card.classList.add('borda-vigilante');
+
+            card.setAttribute('data-status-escala', vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "");
+            const fotoUrl = converterLinkDrive(vigilante.driveUrl);
+            
+            card.style.backgroundColor = "#1e293b"; 
+            aplicarImagemFundo(fotoUrl, card);
+
+            const tagSuperior = document.createElement('div');
+            tagSuperior.style.position = 'absolute'; tagSuperior.style.top = '0'; tagSuperior.style.left = '0'; tagSuperior.style.right = '0';
+            tagSuperior.style.background = 'rgba(0, 0, 0, 0.75)'; tagSuperior.style.display = 'flex'; tagSuperior.style.justifyContent = 'space-between';
+            tagSuperior.style.padding = '1px 3px'; tagSuperior.style.fontSize = '8px'; tagSuperior.style.fontWeight = 'bold';
+            tagSuperior.style.color = '#fff'; tagSuperior.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+
+            const spanPosto = document.createElement('span');
+			if (isAfastadoContainer && vigilante.grupoPuro) {
+			// Agora ele mostrará apenas "A", "B", "C" ou "D"
+			spanPosto.innerText = vigilante.grupoPuro; 
+			spanPosto.style.color = "#fbbf24"; 
+			} else {
+			spanPosto.innerText = vigilante.numPosto || "-";
+			}
+            
+            const spanRamal = document.createElement('span');
+            spanRamal.innerText = vigilante.ramalEscala ? "📞" + vigilante.ramalEscala : ""; spanRamal.style.color = '#94a3b8';
+
+            tagSuperior.appendChild(spanPosto); tagSuperior.appendChild(spanRamal); card.appendChild(tagSuperior);
+
+            let isAniversario = false; let idade = "";
+            if (vigilante.dataNascimento) {
+                let partes = vigilante.dataNascimento.split('-');
+                if (partes.length === 3) {
+                    let anoNasc = parseInt(partes[0]); let mesNasc = parseInt(partes[1]) - 1; let diaNasc = parseInt(partes[2]);
+                    let hoje = new Date();
+                    if (hoje.getMonth() === mesNasc && hoje.getDate() === diaNasc) {
+                        isAniversario = true; idade = hoje.getFullYear() - anoNasc;
+                    }
+                }
+            }
+
+            if (isAniversario) {
+                const balao = document.createElement('div');
+                balao.innerText = "🎈";
+                balao.style.position = 'absolute'; balao.style.top = '-8px'; balao.style.right = '-8px';
+                balao.style.fontSize = '20px'; balao.style.zIndex = '20'; balao.style.filter = 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))';
+                card.appendChild(balao);
+            }
+
+            const tagNome = document.createElement('div');
+            tagNome.className = 'vigilante-nome-tag';
+            tagNome.innerText = vigilante.nome ? vigilante.nome.split(' ')[0] : "Vigilante";
+            card.appendChild(tagNome);
+
+            card.addEventListener('mouseenter', (e) => {
+                const classeVencimento = parseInt(vigilante.diasParaVencer) <= 30 ? 'status-alerta' : '';
+                const postoFormatado = vigilante.postoAtual ? `<div class="posto-destaque">📍 ${vigilante.postoAtual}</div>` : '<div class="posto-destaque" style="color:#64748b;">📍 Posto Não Definido</div>';
+                const formatarData = (data) => data && data.toString().includes('T') ? new Date(data).toLocaleDateString('pt-BR') : data;
+
+                let linhaInformativa = "";
+                let linhaAniversario = "";
+
+                if (isAniversario) {
+                    linhaAniversario = `
+                        <div class="posto-destaque" style="border-left-color: #ec4899; background: #fdf2f8; color: #be185d;">
+                            🎂 <strong>Aniversariante do dia! (${idade} anos)</strong>
+                        </div>
+                    `;
+                }
+                
+                if (vigilante.titularSubstituido) {
+                    linhaInformativa = `
+                        <div class="posto-destaque" style="border-left-color: #eab308; background: #fefce8; color: #a16207;">
+                            🔄 Substituindo: <strong>${vigilante.titularSubstituido}</strong><br>
+                            Motivo: <strong>${vigilante.motivoSubstituicao}</strong>
+                        </div>
+                    `;
+                } else if (isAfastadoContainer && vigilante.substituto && vigilante.substituto.trim() !== "") {
+                    linhaInformativa = `
+                        <div class="posto-destaque" style="border-left-color: #dc2626; background: #fef2f2; color: #b91c1c;">
+                            🔄 Substituído por:<br><strong>${vigilante.substituto}</strong>
+                        </div>
+                    `;
+                }
+
+                tooltipGlobal.innerHTML = `
+                    <div class="tooltip-estrutura">
+                        <div class="tooltip-foto-container" style="background-image: url('${fotoUrl}');"></div>
+                        <div class="tooltip-dados">
+                            <div class="tooltip-header">${vigilante.nome}</div>
+                            <div class="tooltip-linha"><span>Nº Posto:</span> <span>${vigilante.numPosto || 'N/A'}</span></div>
+                            <div class="tooltip-linha"><span>Cadastro:</span> <span>${vigilante.cadastro || 'N/A'}</span></div>
+                            <div class="tooltip-linha"><span>Cargo:</span> <span>${vigilante.cargo || 'N/A'}</span></div>
+                            <div class="tooltip-linha"><span>Validade CNV:</span> <span>${formatarData(vigilante.validadeCnv) || 'N/A'}</span></div>
+                            <div class="tooltip-linha"><span>Validade Curso:</span> <span>${formatarData(vigilante.validadeCurso) || 'N/A'}</span></div>
+                            <div class="tooltip-linha"><span>Dias p/ Vencer:</span> <span class="${classeVencimento}">${vigilante.diasParaVencer || '0'}</span></div>
+                            ${postoFormatado}
+                            ${linhaAniversario}
+                            ${linhaInformativa}
+                            <div class="tooltip-linha"><span>Ramal Posto:</span> <span>${vigilante.ramalEscala || 'N/A'}</span></div>
+                        </div>
+                    </div>
+                `;
+                tooltipGlobal.style.display = 'block';
+            });
+
+            card.addEventListener('mousemove', (e) => {
+                const larguraTooltip = 440; const alturaTooltip = tooltipGlobal.offsetHeight || 230; 
+                let posX = e.clientX + 20; let posY = e.clientY - 40;
+                if (posX + larguraTooltip > window.innerWidth) posX = e.clientX - larguraTooltip - 10;
+                if (posY + alturaTooltip > window.innerHeight) posY = e.clientY - alturaTooltip + 10;
+                if (posY < 10) posY = 10;
+                tooltipGlobal.style.left = posX + 'px'; tooltipGlobal.style.top = posY + 'px';
+            });
+
+            card.addEventListener('mouseleave', () => { tooltipGlobal.style.display = 'none'; });
+            wrapper.appendChild(card); container.appendChild(wrapper);
+        }
+
+        function ajustarDestaqueIntermitentes() {
+            const cardsIntermitentes = document.querySelectorAll('#container-intermitentes .vigilante-card');
+            cardsIntermitentes.forEach(card => {
+                card.getAttribute('data-status-escala') === grupoDeServiçoAtual ? card.classList.add('intermitente-ativo-hoje') : card.classList.remove('intermitente-ativo-hoje');
+            });
+        }
+
+function puxarDadosDoSheets() {
+            fetch(URL_API).then(response => response.json()).then(listaVigilantes => {
+                limparTodosOsContainers();
+
+                let mapaDadosGeral = {};
+                let detalhesSubstitutos = {}; 
+
+                listaVigilantes.forEach(v => { 
+                    if (v.nome) mapaDadosGeral[v.nome.toUpperCase().trim()] = v; 
+                    
+                    if ((v.atestado || v.ferias || v.reciclagem) && v.substituto && v.substituto.trim() !== "") {
+                        let chaveSub = v.substituto.toUpperCase().trim();
+                        let grupoDoTitular = v.statusAtual ? v.statusAtual.toUpperCase().trim() : "";
+                        
+                        let motivo = "Afastado";
+                        if (v.ferias) motivo = "Férias";
+                        else if (v.atestado) motivo = "Atestado";
+                        else if (v.reciclagem) motivo = "Reciclagem";
+
+                        detalhesSubstitutos[chaveSub] = {
+                            grupo: grupoDoTitular,
+                            titularSubstituido: v.nome,
+                            motivoSubstituicao: motivo
+                        };
+                    }
+                });
+
+                listaVigilantes.forEach(vigilante => {
+                    const status = vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "";
+                    const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
+                    const nomeChave = vigilante.nome ? vigilante.nome.toUpperCase().trim() : "";
+                    
+                    if (vigilante.atestado || vigilante.ferias || vigilante.reciclagem) {
+                        
+                        if (vigilante.reciclagem) adicionarVigilanteNaTela(vigilante, 'container-reciclagem');
+                        else if (vigilante.atestado) adicionarVigilanteNaTela(vigilante, 'container-atestado');
+                        else if (vigilante.ferias) adicionarVigilanteNaTela(vigilante, 'container-ferias');
+
+                        if (vigilante.substituto && vigilante.substituto.trim() !== "") {
+                            let chaveSub = vigilante.substituto.toUpperCase().trim();
+                            let dadosReaisSub = mapaDadosGeral[chaveSub];
+                            
+
+                            let cloneSub = { ...vigilante, ...dadosReaisSub, nome: vigilante.substituto.trim() };
+                            
+
+                            if (detalhesSubstitutos[chaveSub]) {
+                                cloneSub.titularSubstituido = detalhesSubstitutos[chaveSub].titularSubstituido;
+                                cloneSub.motivoSubstituicao = detalhesSubstitutos[chaveSub].motivoSubstituicao;
+                            }
+                            
+                            if (status.includes("GRUPO A")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-a');
+                            else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-b');
+                            else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-c');
+                            else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-d');
+                        }
+                    } else {
+
+                        if (!detalhesSubstitutos[nomeChave]) {
+                            if (status.includes("GRUPO A")) adicionarVigilanteNaTela(vigilante, 'container-grupo-a');
+                            else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(vigilante, 'container-grupo-b');
+                            else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(vigilante, 'container-grupo-c');
+                            else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(vigilante, 'container-grupo-d');
+                        }
+                    }
+
+
+                    if (cargo === "VIGILANTE - INTERMITENTE" || cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
+                        
+                        if (detalhesSubstitutos[nomeChave]) {
+                            vigilante.statusAtual = detalhesSubstitutos[nomeChave].grupo;
+                            vigilante.titularSubstituido = detalhesSubstitutos[nomeChave].titularSubstituido;
+                            vigilante.motivoSubstituicao = detalhesSubstitutos[nomeChave].motivoSubstituicao;
+                        }
+                        
+                        adicionarVigilanteNaTela(vigilante, 'container-intermitentes');
+                    }
+                });
+                ajustarDestaqueIntermitentes();
+            }).catch(error => console.error("Erro ao processar dados:", error));
+        }
+
+        Object.keys(blocos).forEach(idBloco => {
+            const elemento = document.getElementById(idBloco);
+            elemento.addEventListener('mouseenter', () => {
+                let tamanhos = [0.5, 0.5, 0.5, 0.5]; tamanhos[blocos[idBloco]] = 2.5;
+                grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
+                Object.keys(blocos).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
+                elemento.classList.add('grupo-ativo');
+                grupoDeServiçoAtual = idBloco.replace('bloco-','').replace('-',' ').toUpperCase();
+                ajustarDestaqueIntermitentes();
+            });
+        });
+
+        grade.addEventListener('mouseleave', () => { calcularGrupoDeServico(); });
+        document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        calcularGrupoDeServico(); puxarDadosDoSheets();
+        setInterval(calcularGrupoDeServico, 60 * 1000); setInterval(puxarDadosDoSheets, 60 * 1000);
+    </script>
+</body>
+</html>
