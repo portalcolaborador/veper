@@ -7,11 +7,7 @@
     <style>
 	
 
-body {
-    position: relative; /* Necessário para o posicionamento da logo */
-    background-color: var(--bg-color);
-}
-
+/* 1. Mantenha o body::before como a base da imagem */
 body::before {
     content: "";
     position: fixed;
@@ -19,19 +15,27 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    /* Substitua pelo seu link direto corrigido */
     background-image: url('https://lh3.googleusercontent.com/d/1Ks1EdzxcIePp0Y7r_c8mAVDQ4qpwJoTP');
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 25%; /* Aumente aqui para a imagem ficar "bem grandona" */
-    opacity: 0.15; /* Transparência: 0.1 (bem clara) a 0.3 (mais visível) */
-    pointer-events: none; /* Garante que você consiga clicar nos botões por cima da imagem */
-    z-index: -1; /* Joga a imagem para o fundo de tudo */
+    background-size: 22%;
+    z-index: 0; /* Fica no nível da página */
+    pointer-events: none;
 }
 
-/* Opcional: Se quiser a logo bem clarinha, edite o arquivo .png 
-   original com opacidade baixa e suba ele para o Drive. 
-   É mais eficiente para o desempenho do navegador. */
+/* 2. Aplique transparência e mesclagem nos blocos cinzas */
+.secao-bloco, .header-painel, .area-status-inferior, .area-status-superior {
+    background-color: rgba(15, 23, 42, 0.45) !important; /* O 0.85 é a transparência que deixa a logo aparecer atrás */
+    backdrop-filter: blur(2px); /* Efeito de vidro fosco para a logo aparecer suave */
+    position: relative;
+    z-index: 1;
+}
+
+/* 3. Garante que as fotos fiquem por cima de tudo, bloqueando a logo */
+.vigilante-card {
+    background-color: #334155;
+    z-index: 2; /* As fotos sempre ficam no topo */
+}
 	
 	#container-seoe .vigilante-container > .vigilante-card > div[style*="background: rgba(0, 0, 0, 0.75)"] {
     display: none !important;
@@ -121,10 +125,24 @@ body::before {
         }
 
         .fotos-status-linha {
-            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 6px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-            grid-auto-rows: 66px; gap: 8px; min-height: 50px; max-height: 150px; align-items: center; overflow-y: auto !important;
-        }
+    /* Trocamos var(--panel-bg) por uma cor rgba com 85% de opacidade */
+    background: rgba(15, 23, 42, 0.45) !important; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px;
+    padding: 6px 12px; 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    grid-auto-rows: 66px; 
+    gap: 8px; 
+    min-height: 50px; 
+    max-height: 150px; 
+    align-items: center; 
+    overflow-y: auto !important;
+    
+    /* Adicione isto para dar o efeito de vidro fosco que torna o texto mais legível */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
         .fotos-status-linha::-webkit-scrollbar { width: 0px; }
 
         .vigilante-container { width: 84px; height: 106px; }
