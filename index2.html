@@ -7,6 +7,32 @@
     <style>
 	
 
+body {
+    position: relative; /* Necessário para o posicionamento da logo */
+    background-color: var(--bg-color);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Substitua pelo seu link direto corrigido */
+    background-image: url('https://lh3.googleusercontent.com/d/1Ks1EdzxcIePp0Y7r_c8mAVDQ4qpwJoTP');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%; /* Aumente aqui para a imagem ficar "bem grandona" */
+    opacity: 0.15; /* Transparência: 0.1 (bem clara) a 0.3 (mais visível) */
+    pointer-events: none; /* Garante que você consiga clicar nos botões por cima da imagem */
+    z-index: -1; /* Joga a imagem para o fundo de tudo */
+}
+
+/* Opcional: Se quiser a logo bem clarinha, edite o arquivo .png 
+   original com opacidade baixa e suba ele para o Drive. 
+   É mais eficiente para o desempenho do navegador. */
+	
 	#container-seoe .vigilante-container > .vigilante-card > div[style*="background: rgba(0, 0, 0, 0.75)"] {
     display: none !important;
 		}
@@ -145,6 +171,7 @@
 </head>
 <body>
 
+
 <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:999999; display:flex; flex-direction:column; justify-content:center; align-items:center;">
     <h2 style="margin-bottom:20px; color:#fff;">ACESSO RESTRITO</h2>
     <input type="password" id="senha-acesso" placeholder="Digite a senha..." style="padding:10px; width:200px; border-radius:5px;">
@@ -163,7 +190,7 @@
 </script>
 
     <div class="header-painel">
-        <div class="logo-area">VEPER SEGURANÇA</div>
+        <div class="logo-area">ITAIPU BINACIONAL</div>
         <h1>Divisão de Segurança Externa</h1>
         <div id="data-atual" style="font-weight: 600; color: #cbd5e1;"></div>
     </div>
