@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carômetro Operacional - Segurança Externa</title>
     <style>
+	
+
+	#container-seoe .vigilante-container > .vigilante-card > div[style*="background: rgba(0, 0, 0, 0.75)"] {
+    display: none !important;
+		}
+	
+		.borda-seoe { 
+            border-color: #22c55e !important; 
+            box-shadow: inset 0 0 6px #22c55e; 
+        }
+        
+        /* Força os cards dentro do SEOE a ficarem sempre coloridos e com opacidade total */
+        #container-seoe .vigilante-card { 
+            filter: grayscale(0%) !important; 
+            opacity: 1 !important; 
+        }
+		
         :root {
             --bg-color: #1e293b;
             --panel-bg: #0f172a;
@@ -150,6 +167,13 @@
         <h1>Divisão de Segurança Externa</h1>
         <div id="data-atual" style="font-weight: 600; color: #cbd5e1;"></div>
     </div>
+	
+	<div class="area-status-superior" style="margin-bottom: 15px;">
+    <div class="linha-status">
+        <div class="label-status">SEOE</div>
+        <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px;"></div>
+    </div>
+</div>
 
     <div class="quadro-principal">
         <div class="grade-grupos" id="grade-operacional">
@@ -250,7 +274,7 @@
 
         function limparTodosOsContainers() {
             Object.keys(blocos).forEach(b => document.getElementById(b.replace('bloco-', 'container-')).innerHTML = '');
-            ['container-reciclagem', 'container-atestado', 'container-ferias', 'container-intermitentes'].forEach(id => {
+            ['container-seoe', 'container-reciclagem', 'container-atestado', 'container-ferias', 'container-intermitentes'].forEach(id => {
                 const el = document.getElementById(id); if (el) el.innerHTML = '';
             });
         }
@@ -264,9 +288,16 @@
             const card = document.createElement('div'); card.className = 'vigilante-card';
             
             const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
-            if (cargo === "SUPERVISOR OPERACIONAL" || cargo === "SUPERVISOR ADMINISTRATIVO" || cargo === "COORDENADOR") card.classList.add('borda-supervisor');
-            else if (cargo === "VIGILANTE - INTERMITENTE" || cargo.includes("INTERMITENTE")) card.classList.add('borda-intermitente');
-            else card.classList.add('borda-vigilante');
+            
+            if (cargo.includes("SEOE")) {
+                card.classList.add('borda-seoe');
+            } else if (cargo === "SUPERVISOR OPERACIONAL" || cargo === "SUPERVISOR ADMINISTRATIVO" || cargo === "COORDENADOR") {
+                card.classList.add('borda-supervisor');
+            } else if (cargo === "VIGILANTE - INTERMITENTE" || cargo.includes("INTERMITENTE")) {
+                card.classList.add('borda-intermitente');
+            } else {
+                card.classList.add('borda-vigilante');
+            }
 
             card.setAttribute('data-status-escala', vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "");
             const fotoUrl = converterLinkDrive(vigilante.driveUrl);
@@ -421,7 +452,14 @@ function puxarDadosDoSheets() {
                     const status = vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "";
                     const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
                     const nomeChave = vigilante.nome ? vigilante.nome.toUpperCase().trim() : "";
-                    
+                 
+                    // NOVO: Verifica se é SEOE e joga para o quadro superior
+                    if (cargo.includes("SEOE")) {
+                        adicionarVigilanteNaTela(vigilante, 'container-seoe');
+                        return; // O return faz com que ele não seja processado nos outros grupos de baixo
+                    }
+
+                    // A partir daqui, seu código original de atestado, férias, reciclagem continua normal...
                     if (vigilante.atestado || vigilante.ferias || vigilante.reciclagem) {
                         
                         if (vigilante.reciclagem) adicionarVigilanteNaTela(vigilante, 'container-reciclagem');
