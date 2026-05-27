@@ -7,7 +7,7 @@
     <style>
 	
 
-/* 1. Mantenha o body::before como a base da imagem */
+
 body::before {
     content: "";
     position: fixed;
@@ -23,18 +23,18 @@ body::before {
     pointer-events: none;
 }
 
-/* 2. Aplique transparência e mesclagem nos blocos cinzas */
+
 .secao-bloco, .header-painel, .area-status-inferior, .area-status-superior {
-    background-color: rgba(15, 23, 42, 0.45) !important; /* O 0.85 é a transparência que deixa a logo aparecer atrás */
-    backdrop-filter: blur(2px); /* Efeito de vidro fosco para a logo aparecer suave */
+    background-color: rgba(15, 23, 42, 0.45) !important; 
+    backdrop-filter: blur(2px); 
     position: relative;
     z-index: 1;
 }
 
-/* 3. Garante que as fotos fiquem por cima de tudo, bloqueando a logo */
+
 .vigilante-card {
     background-color: #334155;
-    z-index: 2; /* As fotos sempre ficam no topo */
+    z-index: 2; 
 }
 	
 	#container-seoe .vigilante-container > .vigilante-card > div[style*="background: rgba(0, 0, 0, 0.75)"] {
@@ -46,7 +46,6 @@ body::before {
             box-shadow: inset 0 0 6px #22c55e; 
         }
         
-        /* Força os cards dentro do SEOE a ficarem sempre coloridos e com opacidade total */
         #container-seoe .vigilante-card { 
             filter: grayscale(0%) !important; 
             opacity: 1 !important; 
@@ -127,7 +126,6 @@ body::before {
         }
 
         .fotos-status-linha {
-    /* Trocamos var(--panel-bg) por uma cor rgba com 85% de opacidade */
     background: rgba(15, 23, 42, 0.45) !important; 
     border: 1px solid var(--border-color); 
     border-radius: 8px;
@@ -141,7 +139,6 @@ body::before {
     align-items: center; 
     overflow-y: auto !important;
     
-    /* Adicione isto para dar o efeito de vidro fosco que torna o texto mais legível */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
@@ -210,7 +207,7 @@ body::before {
 </script>
 
 <style>
-  /* Define uma classe que esconde o mouse */
+
   .cursor-none {
     cursor: none;
   }
