@@ -90,6 +90,8 @@ body::before {
         .grade-grupos {
             display: grid; grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr; gap: 12px;
             transition: grid-template-columns 0.4s ease; height: 100%; min-height: 0;
+			transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: grid-template-columns;
         }
 
         .secao-bloco {
@@ -207,6 +209,33 @@ body::before {
     }
 </script>
 
+<style>
+  /* Define uma classe que esconde o mouse */
+  .cursor-none {
+    cursor: none;
+  }
+</style>
+
+<script>
+  let timer;
+  const tempoInatividade = 3000;
+
+  function esconderCursor() {
+    document.body.classList.add('cursor-none');
+  }
+
+  function mostrarCursor() {
+    document.body.classList.remove('cursor-none');
+    
+    clearTimeout(timer);
+    timer = setTimeout(esconderCursor, tempoInatividade);
+  }
+
+  document.addEventListener('mousemove', mostrarCursor);
+
+  timer = setTimeout(esconderCursor, tempoInatividade);
+</script>
+
     <div class="header-painel">
         <div class="logo-area">ITAIPU BINACIONAL</div>
         <h1>Divisão de Segurança Externa</h1>
@@ -239,10 +268,10 @@ body::before {
     <div id="global-tooltip"></div>
 	
 	<script>
-    // Bloquear botão direito do mouse
+
     document.addEventListener('contextmenu', event => event.preventDefault());
 
-    // Bloquear atalhos de teclado (F12, Ctrl+Shift+I, Ctrl+U)
+
     document.onkeydown = function(e) {
         if(e.keyCode == 123) return false; // F12
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
@@ -475,7 +504,6 @@ function puxarDadosDoSheets() {
             let mapaDadosGeral = {};
             let detalhesSubstitutos = {}; 
 
-            // 1. Mapeamento inicial
             listaVigilantes.forEach(v => { 
                 if (v.nome) mapaDadosGeral[v.nome.toUpperCase().trim()] = v; 
                 
@@ -492,12 +520,10 @@ function puxarDadosDoSheets() {
                 }
             });
 
-            // 2. Processar e Renderizar SEOE (Ordenado por data)
             let listaSeoe = listaVigilantes.filter(v => v.cargo && v.cargo.toUpperCase().includes("SEOE"));
             listaSeoe.sort((a, b) => a.dataAdmissao - b.dataAdmissao);
             listaSeoe.forEach(vigilante => adicionarVigilanteNaTela(vigilante, 'container-seoe'));
 
-            // 3. Processar os demais (Ignorando quem já foi para o SEOE)
             listaVigilantes.forEach(vigilante => {
                 if (vigilante.cargo && vigilante.cargo.toUpperCase().includes("SEOE")) return;
 
@@ -548,17 +574,28 @@ function puxarDadosDoSheets() {
         .catch(error => console.error("Erro ao processar dados:", error));
 }
 
-        Object.keys(blocos).forEach(idBloco => {
-            const elemento = document.getElementById(idBloco);
-            elemento.addEventListener('mouseenter', () => {
-                let tamanhos = [0.5, 0.5, 0.5, 0.5]; tamanhos[blocos[idBloco]] = 2.5;
-                grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
-                Object.keys(blocos).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
-                elemento.classList.add('grupo-ativo');
-                grupoDeServiçoAtual = idBloco.replace('bloco-','').replace('-',' ').toUpperCase();
-                ajustarDestaqueIntermitentes();
-            });
-        });
+
+Object.keys(blocos).forEach(idBloco => {
+    const elemento = document.getElementById(idBloco);
+    let hoverTimer;
+
+    elemento.addEventListener('mouseenter', () => {
+        hoverTimer = setTimeout(() => {
+            let tamanhos = [0.5, 0.5, 0.5, 0.5]; 
+            tamanhos[blocos[idBloco]] = 2.5;
+            grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
+            
+            Object.keys(blocos).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
+            elemento.classList.add('grupo-ativo');
+            grupoDeServiçoAtual = idBloco.replace('bloco-','').replace('-',' ').toUpperCase();
+            ajustarDestaqueIntermitentes();
+        }, 200);
+    });
+
+    elemento.addEventListener('mouseleave', () => {
+        clearTimeout(hoverTimer);
+    });
+});
 
         grade.addEventListener('mouseleave', () => { calcularGrupoDeServico(); });
         document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
