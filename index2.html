@@ -422,56 +422,57 @@ body::before {
             card.appendChild(tagNome);
 
             card.addEventListener('mouseenter', (e) => {
-                const classeVencimento = parseInt(vigilante.diasParaVencer) <= 30 ? 'status-alerta' : '';
-                const postoFormatado = vigilante.postoAtual ? `<div class="posto-destaque">📍 ${vigilante.postoAtual}</div>` : '<div class="posto-destaque" style="color:#64748b;">📍 Posto Não Definido</div>';
-                const formatarData = (data) => data && data.toString().includes('T') ? new Date(data).toLocaleDateString('pt-BR') : data;
+    const classeVencimento = parseInt(vigilante.diasParaVencer) <= 30 ? 'status-alerta' : '';
+    const postoFormatado = vigilante.postoAtual ? `<div class="posto-destaque">📍 ${vigilante.postoAtual}</div>` : '<div class="posto-destaque" style="color:#64748b;">📍 Posto Não Definido</div>';
+    const formatarData = (data) => data && data.toString().includes('T') ? new Date(data).toLocaleDateString('pt-BR') : data;
 
-                let linhaInformativa = "";
-                let linhaAniversario = "";
+    let linhaInformativa = "";
+    let linhaAniversario = "";
 
-                if (isAniversario) {
-                    linhaAniversario = `
-                        <div class="posto-destaque" style="border-left-color: #ec4899; background: #fdf2f8; color: #be185d;">
-                            🎂 <strong>Aniversariante do dia!</strong>
-                        </div>
-                    `;
-                }
-                
-                if (vigilante.titularSubstituido) {
-                    linhaInformativa = `
-                        <div class="posto-destaque" style="border-left-color: #eab308; background: #fefce8; color: #a16207;">
-                            🔄 Substituindo: <strong>${vigilante.titularSubstituido}</strong><br>
-                            Motivo: <strong>${vigilante.motivoSubstituicao}</strong>
-                        </div>
-                    `;
-                } else if (isAfastadoContainer && vigilante.substituto && vigilante.substituto.trim() !== "") {
-                    linhaInformativa = `
-                        <div class="posto-destaque" style="border-left-color: #dc2626; background: #fef2f2; color: #b91c1c;">
-                            🔄 Substituído por:<br><strong>${vigilante.substituto}</strong>
-                        </div>
-                    `;
-                }
+    if (isAniversario) {
+        linhaAniversario = `<div class="posto-destaque" style="border-left-color: #ec4899; background: #fdf2f8; color: #be185d;">🎂 <strong>Aniversariante do dia!</strong></div>`;
+    }
 
-                tooltipGlobal.innerHTML = `
-                    <div class="tooltip-estrutura">
-                        <div class="tooltip-foto-container" style="background-image: url('${fotoUrl}');"></div>
-                        <div class="tooltip-dados">
-                            <div class="tooltip-header">${vigilante.nome}</div>
-                            <div class="tooltip-linha"><span>Nº Posto:</span> <span>${vigilante.numPosto || 'N/A'}</span></div>
-                            <div class="tooltip-linha"><span>Cadastro:</span> <span>${vigilante.cadastro || 'N/A'}</span></div>
-                            <div class="tooltip-linha"><span>Cargo:</span> <span>${vigilante.cargo || 'N/A'}</span></div>
-                            <div class="tooltip-linha"><span>Validade CNV:</span> <span>${formatarData(vigilante.validadeCnv) || 'N/A'}</span></div>
-                            <div class="tooltip-linha"><span>Validade Curso:</span> <span>${formatarData(vigilante.validadeCurso) || 'N/A'}</span></div>
-                            <div class="tooltip-linha"><span>Dias p/ Vencer:</span> <span class="${classeVencimento}">${vigilante.diasParaVencer || '0'}</span></div>
-                            ${postoFormatado}
-                            ${linhaAniversario}
-                            ${linhaInformativa}
-                            <div class="tooltip-linha"><span>Ramal Posto:</span> <span>${vigilante.ramalEscala || 'N/A'}</span></div>
-                        </div>
-                    </div>
-                `;
-                tooltipGlobal.style.display = 'block';
-            });
+    if (vigilante.titularSubstituido) {
+        linhaInformativa = `<div class="posto-destaque" style="border-left-color: #eab308; background: #fefce8; color: #a16207;">🔄 Substituindo: <strong>${vigilante.titularSubstituido}</strong><br>Motivo: <strong>${vigilante.motivoSubstituicao}</strong></div>`;
+    } else if (isAfastadoContainer && vigilante.substituto && vigilante.substituto.trim() !== "") {
+        linhaInformativa = `<div class="posto-destaque" style="border-left-color: #dc2626; background: #fef2f2; color: #b91c1c;">🔄 Substituído por:<br><strong>${vigilante.substituto}</strong></div>`;
+    }
+
+    // A lógica do histórico que você precisa:
+    let linhasHistorico = "";
+    if (vigilante.historico && vigilante.historico.length > 0) {
+        linhasHistorico = `<div style="margin-top:10px; border-top:1px solid #cbd5e1; padding-top:5px;">
+            <div style="font-size:10px; font-weight:bold; color:#475569; margin-bottom:3px;">HISTÓRICO DE POSTOS:</div>
+            ${vigilante.historico.map(h => `
+                <div class="tooltip-linha" style="margin-bottom:2px;">
+                    <span>${h.data}:</span> <span>${h.posto}</span>
+                </div>
+            `).join('')}
+        </div>`;
+    }
+
+    tooltipGlobal.innerHTML = `
+        <div class="tooltip-estrutura">
+            <div class="tooltip-foto-container" style="background-image: url('${fotoUrl}');"></div>
+            <div class="tooltip-dados">
+                <div class="tooltip-header">${vigilante.nome}</div>
+                <div class="tooltip-linha"><span>Nº Posto:</span> <span>${vigilante.numPosto || 'N/A'}</span></div>
+                <div class="tooltip-linha"><span>Cadastro:</span> <span>${vigilante.cadastro || 'N/A'}</span></div>
+                <div class="tooltip-linha"><span>Cargo:</span> <span>${vigilante.cargo || 'N/A'}</span></div>
+                <div class="tooltip-linha"><span>Validade CNV:</span> <span>${formatarData(vigilante.validadeCnv) || 'N/A'}</span></div>
+                <div class="tooltip-linha"><span>Validade Curso:</span> <span>${formatarData(vigilante.validadeCurso) || 'N/A'}</span></div>
+                <div class="tooltip-linha"><span>Dias p/ Vencer:</span> <span class="${classeVencimento}">${vigilante.diasParaVencer || '0'}</span></div>
+                ${postoFormatado}
+                ${linhaAniversario}
+                ${linhaInformativa}
+                <div class="tooltip-linha"><span>Ramal Posto:</span> <span>${vigilante.ramalEscala || 'N/A'}</span></div>
+                ${linhasHistorico} 
+            </div>
+        </div>
+    `;
+    tooltipGlobal.style.display = 'block';
+});
 
             card.addEventListener('mousemove', (e) => {
                 const larguraTooltip = 440; const alturaTooltip = tooltipGlobal.offsetHeight || 230; 
