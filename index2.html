@@ -383,13 +383,13 @@ body::before {
             tagSuperior.style.padding = '1px 3px'; tagSuperior.style.fontSize = '14px'; tagSuperior.style.fontWeight = 'bold';
             tagSuperior.style.color = '#fff'; tagSuperior.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
 
-            const spanPosto = document.createElement('span');
-			if (isAfastadoContainer && vigilante.grupoPuro) {
-			spanPosto.innerText = vigilante.grupoPuro; 
-			spanPosto.style.color = "#fbbf24"; 
-			} else {
-			spanPosto.innerText = vigilante.numPosto || "-";
-			}
+const spanPosto = document.createElement('span');
+if (isAfastadoContainer) {
+    spanPosto.innerText = vigilante.grupoPuro || "-"; 
+    spanPosto.style.color = "#fbbf24";
+} else {
+    spanPosto.innerText = vigilante.numPosto || "-";
+}
             
             const spanRamal = document.createElement('span');
             spanRamal.innerText = vigilante.ramalEscala ? "📞" + vigilante.ramalEscala : ""; spanRamal.style.color = '#94a3b8';
@@ -418,8 +418,8 @@ body::before {
 
             const tagNome = document.createElement('div');
             tagNome.className = 'vigilante-nome-tag';
-            tagNome.innerText = vigilante.nome ? vigilante.nome.split(' ')[0] : "Vigilante";
-            card.appendChild(tagNome);
+            tagNome.innerText = vigilante.nomeExibicao || vigilante.nome.split(' ')[0] || "Vigilante";
+			card.appendChild(tagNome);
 
             card.addEventListener('mouseenter', (e) => {
     const classeVencimento = parseInt(vigilante.diasParaVencer) <= 30 ? 'status-alerta' : '';
