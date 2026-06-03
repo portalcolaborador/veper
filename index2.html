@@ -197,7 +197,7 @@ body::before {
     <button onclick="verificarSenha()" style="margin-top:10px; padding:10px 20px; cursor:pointer;">ENTRAR</button>
 </div>
 
-<script>
+//<script>
     function verificarSenha() {
         const senhaDigitada = document.getElementById('senha-acesso').value;
         if (senhaDigitada === "2026") { 
@@ -206,7 +206,7 @@ body::before {
             alert("Senha incorreta!");
         }
     }
-</script>
+//</script>
 
 <style>
   .cursor-none {
@@ -600,7 +600,7 @@ Object.keys(blocos).forEach(idBloco => {
         document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         
         calcularGrupoDeServico(); puxarDadosDoSheets();
-        setInterval(calcularGrupoDeServico, 60 * 1000); setInterval(puxarDadosDoSheets, 10 * 60 * 1000);
+        setInterval(calcularGrupoDeServico, 60 * 1000); setInterval(puxarDadosDoSheets, 5 * 60 * 1000);
     </script>
 </body>
 </html>
