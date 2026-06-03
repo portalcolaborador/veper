@@ -607,8 +607,9 @@ async function carregarCalendario() {
                     }
 
                     // B. Regra de Abril/2026: Ímpar (A/C) e Par (B/D)
-                    let ehDiaImpar = (d % 2 !== 0);
-                    let letraGrupo = "";
+					// Se quer a escala normal, deixe 0. Se quiser invertida, mude para 1.
+					let inversor = 1; 
+					let ehDiaImpar = ((d + inversor) % 2 !== 0);
                     
                     if (horaInicio >= 5 && horaInicio < 18) {
                         // DIURNO
