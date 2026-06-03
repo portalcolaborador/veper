@@ -608,8 +608,17 @@ async function carregarCalendario() {
 
                     // B. Regra de Abril/2026: Ímpar (A/C) e Par (B/D)
 					// Se quer a escala normal, deixe 0. Se quiser invertida, mude para 1.
-					let inversor = 1; 
-					let ehDiaImpar = ((d + inversor) % 2 !== 0);
+					// 1. Descobre o último dia do mês anterior
+const ultimoDiaMesAnterior = new Date(ano, mes, 0).getDate();
+
+// 2. Define o inversor automaticamente:
+// Se o mês teve 31 dias, ele "quebra" a paridade (Ímpar->Ímpar).
+// Se teve 30 dias, ele mantém (Par->Ímpar).
+// Se o último dia do mês anterior for ÍMPAR, inverte a escala (inversor = 1).
+let inversor = (ultimoDiaMesAnterior % 2 !== 0) ? 1 : 0;
+
+// 3. Aplica no seu cálculo
+let ehDiaImpar = ((d + inversor) % 2 !== 0);
                     
                     if (horaInicio >= 5 && horaInicio < 18) {
                         // DIURNO
