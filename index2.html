@@ -214,6 +214,22 @@ body::before {
   document.addEventListener('mousemove', mostrarCursor);
 
   timer = setTimeout(esconderCursor, tempoInatividade);
+  
+  function agendarAtualizacaoMeiaNoite() {
+    const agora = new Date();
+
+    const amanha = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1, 0, 0, 0);
+    const tempoAteMeiaNoite = amanha - agora;
+
+
+    setTimeout(() => {
+        location.reload();
+    }, tempoAteMeiaNoite);
+}
+
+// Inicializa a função
+agendarAtualizacaoMeiaNoite();
+  
 </script>
 
     <div class="header-painel">
@@ -268,16 +284,26 @@ body::before {
         let grupoDeServiçoAtual = "GRUPO A";
 
         function calcularGrupoDeServico() {
-            const agora = new Date(); const hora = agora.getHours();
-            const dataRef = new Date(2026, 4, 21, 0, 0, 0);
-            const dataHojeZerada = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
-            const diferencaTempo = dataHojeZerada.getTime() - dataRef.getTime();
-            const diasCorridos = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+    const agora = new Date();
+    const hora = agora.getHours();
+    const dataRef = new Date(2026, 4, 21, 0, 0, 0);
+    const dataHojeZerada = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
+    let diferencaTempo = dataHojeZerada.getTime() - dataRef.getTime();
+    
+    // Ajuste: Se for entre 00h e 06h, considera como parte do dia anterior para o cálculo do grupo
+    if (hora < 6) {
+        diferencaTempo -= (1000 * 60 * 60 * 24);
+    }
 
-            let grupoDefinido = (diasCorridos % 2 === 0) ? ((hora >= 6 && hora < 18) ? "GRUPO A" : "GRUPO C") : ((hora >= 6 && hora < 18) ? "GRUPO B" : "GRUPO D");
-            grupoDeServiçoAtual = grupoDefinido;
-            atualizarLayoutSanfona(grupoDefinido);
-        }
+    const diasCorridos = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+    
+    let grupoDefinido = (diasCorridos % 2 === 0) 
+        ? ((hora >= 6 && hora < 18) ? "GRUPO A" : "GRUPO C") 
+        : ((hora >= 6 && hora < 18) ? "GRUPO B" : "GRUPO D");
+
+    grupoDeServiçoAtual = grupoDefinido;
+    atualizarLayoutSanfona(grupoDefinido);
+}
 
         function atualizarLayoutSanfona(nomeGrupo) {
             let idBlocoAlvo = "bloco-grupo-a";
