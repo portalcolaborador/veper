@@ -6,6 +6,25 @@
     <title>Carômetro Operacional - Segurança Externa</title>
     <style>
 	
+	/* Barra de Notícias */
+.news-ticker-container {
+    width: 100%; height: 40px; background: #0f172a; border: 1px solid #334155; 
+    margin-bottom: 15px; border-radius: 8px; overflow: hidden; position: relative;
+    display: flex; align-items: center;
+}
+.news-content {
+    white-space: nowrap; color: #facc15; font-weight: bold; font-size: 16px;
+    animation: marquee 90s linear infinite; display: inline-block; padding-left: 100%;
+}
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+.news-tag {
+    background: #dc2626; color: white; padding: 0 15px; height: 100%;
+    display: flex; align-items: center; font-weight: bold; font-size: 14px;
+    text-transform: uppercase; margin-right: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+}
 
 
 body::before {
@@ -190,6 +209,10 @@ body::before {
 </head>
 <body>
 
+<div class="news-ticker-container">
+    <div class="news-content" id="news-container-ticker">Conectando ao sistema de notícias...</div>
+</div>
+
 <style>
   .cursor-none {
     cursor: none;
@@ -229,6 +252,39 @@ body::before {
 
 // Inicializa a função
 agendarAtualizacaoMeiaNoite();
+
+// Função de Notícias Real
+
+    async function carregarNoticias() {
+    const container = document.getElementById('news-container-ticker');
+    
+    // O seu link do Google News, mas ajustado para formato RSS
+    const feedUrl = 'https://g1.globo.com/rss/g1/';
+    
+    // Converte e adiciona o Date.now() para nunca travar notícia velha
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&_t=${Date.now()}`;
+    
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (data.items && data.items.length > 0) {
+            // Pega os títulos e separa com o marcador visual
+            const noticias = data.items.map(i => i.title).join('  •  ');
+            container.innerText = noticias;
+        } else {
+            throw new Error("Feed vazio");
+        }
+    } catch (e) {
+        console.error("Tentando reconectar...", e);
+        container.innerText = "Conectando à central do Google News...";
+    }
+}
+
+// Inicia a função e programa para rodar a cada 1 minuto (60000 ms)
+carregarNoticias();
+setInterval(carregarNoticias, 60000);
+
   
 </script>
 
