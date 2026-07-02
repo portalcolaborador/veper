@@ -615,7 +615,12 @@ const ultimoDiaMesAnterior = new Date(ano, mes, 0).getDate();
 // Se o mês teve 31 dias, ele "quebra" a paridade (Ímpar->Ímpar).
 // Se teve 30 dias, ele mantém (Par->Ímpar).
 // Se o último dia do mês anterior for ÍMPAR, inverte a escala (inversor = 1).
-let inversor = (ultimoDiaMesAnterior % 2 !== 0) ? 1 : 0;
+// Pega o mês atual (0 = Janeiro, 6 = Julho, 7 = Agosto...)
+const mesAtual = new Date().getMonth(); 
+
+// Força a inversão apenas para o mês 6 (Julho). 
+// Quando virar Agosto (mes 7), ele volta a calcular automaticamente.
+let inversor = (mesAtual === 6) ? 1 : 0;
 
 // 3. Aplica no seu cálculo
 let ehDiaImpar = ((d + inversor) % 2 !== 0);
