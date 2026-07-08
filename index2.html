@@ -5,105 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carômetro Operacional - Segurança Externa</title>
     <style>
-	
-
-
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('https://lh3.googleusercontent.com/d/1Ks1EdzxcIePp0Y7r_c8mAVDQ4qpwJoTP');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 25%;
-    z-index: 0; /* Fica no nível da página */
-    pointer-events: none;
-}
-
-
-.secao-bloco, .header-painel, .area-status-inferior, .area-status-superior {
-    background-color: rgba(15, 23, 42, 0.45) !important; /* O 0.85 é a transparência que deixa a logo aparecer atrás */
-    backdrop-filter: blur(2px); /* Efeito de vidro fosco para a logo aparecer suave */
-    position: relative;
-    z-index: 1;
-}
-
-
-.vigilante-card {
-    background-color: #334155;
-    z-index: 2; /* As fotos sempre ficam no topo */
-}
-	
-	#container-seoe .vigilante-container > .vigilante-card > div[style*="background: rgba(0, 0, 0, 0.75)"] {
-    display: none !important;
-		}
-	
-		.borda-seoe { 
-            border-color: #22c55e !important; 
-            box-shadow: inset 0 0 6px #22c55e; 
+        /* =========================================
+           ESTILOS GERAIS E FUNDO
+           ========================================= */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://lh3.googleusercontent.com/d/1Ks1EdzxcIePp0Y7r_c8mAVDQ4qpwJoTP');
+            background-repeat: no-repeat; background-position: center; background-size: 25%;
+            z-index: 0; pointer-events: none;
         }
-        
 
-        #container-seoe .vigilante-card { 
-            filter: grayscale(0%) !important; 
-            opacity: 1 !important; 
-        }
-		
         :root {
-            --bg-color: #1e293b;
-            --panel-bg: #0f172a;
-            --card-bg: #ffffff;
-            --text-light: #f8fafc;
-            --text-dark: #0f172a;
-            --border-color: #334155;
-            --cor-grupo-a: #dc2626;
-            --cor-grupo-b: #eab308;
-            --cor-grupo-c: #2563eb;
-            --cor-grupo-d: #16a34a;
+            --bg-color: #1e293b; --panel-bg: #0f172a; --text-light: #f8fafc; --text-dark: #0f172a;
+            --border-color: #334155; --cor-grupo-a: #dc2626; --cor-grupo-b: #eab308;
+            --cor-grupo-c: #2563eb; --cor-grupo-d: #16a34a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-light);
-            padding: 15px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            background-color: var(--bg-color); color: var(--text-light);
+            padding: 15px; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* =========================================
+           CABEÇALHO
+           ========================================= */
+        .header-painel, .secao-bloco, .area-status-inferior, .area-status-superior {
+            background-color: rgba(15, 23, 42, 0.45) !important;
+            backdrop-filter: blur(2px); position: relative; z-index: 1;
         }
 
         .header-painel {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--panel-bg); padding: 12px 25px;
-            border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;
+            padding: 12px 25px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;
         }
-
         .header-painel h1 { font-size: 22px; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
         .logo-area { font-weight: bold; font-size: 16px; color: #94a3b8; letter-spacing: 2px; }
 
+        /* =========================================
+           GRID PRINCIPAL E BLOCOS
+           ========================================= */
         .quadro-principal { display: grid; grid-template-columns: 1fr; flex: 1; min-height: 0; }
         .grade-grupos {
             display: grid; grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr; gap: 12px;
-            transition: grid-template-columns 0.4s ease; height: 100%; min-height: 0;
-			transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: grid-template-columns;
+            height: 100%; min-height: 0;
+            transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: grid-template-columns;
         }
 
         .secao-bloco {
-            background: var(--panel-bg); border: 1px solid var(--border-color);
-            border-radius: 8px; padding: 10px; display: flex; flex-direction: column;
-            min-height: 0; max-height: 100%; overflow: hidden !important;
+            border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;
+            display: flex; flex-direction: column; min-height: 0; max-height: 100%; overflow: hidden !important;
         }
-
         .titulo-secao {
             text-align: center; font-weight: 700; padding: 6px; margin-bottom: 10px;
-            border-radius: 4px; text-transform: uppercase; font-size: 13px; color: #fff;
-            background: #475569; white-space: nowrap;
+            border-radius: 4px; text-transform: uppercase; font-size: 13px; color: #fff; white-space: nowrap;
         }
 
         .bg-grupo-a { background-color: var(--cor-grupo-a); }
@@ -113,39 +70,30 @@ body::before {
 
         .zona-fotos {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-            grid-auto-rows: 106px; gap: 3px; align-content: flex-start; flex: 1;
-            overflow-y: auto !important; overflow-x: hidden !important;
+            grid-auto-rows: 106px; gap: 3px; align-content: flex-start; flex: 1; overflow-y: auto !important; overflow-x: hidden !important;
         }
-        .zona-fotos::-webkit-scrollbar { width: 0px; }
-        
+        .zona-fotos::-webkit-scrollbar, .fotos-status-linha::-webkit-scrollbar { width: 0px; }
+
+        /* =========================================
+           STATUS INFERIOR / SUPERIOR
+           ========================================= */
         .area-status-inferior { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
         .linha-status { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: center; }
-
         .label-status {
             background: #334155; color: #fff; font-weight: bold; text-transform: uppercase;
             font-size: 11px; padding: 8px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color);
         }
 
         .fotos-status-linha {
-    background: rgba(15, 23, 42, 0.45) !important; 
-    border: 1px solid var(--border-color); 
-    border-radius: 8px;
-    padding: 6px 12px; 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-    grid-auto-rows: 66px; 
-    gap: 8px; 
-    min-height: 50px; 
-    max-height: 150px; 
-    align-items: center; 
-    overflow-y: auto !important;
-    
+            background: rgba(15, 23, 42, 0.45) !important; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 6px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+            grid-auto-rows: 66px; gap: 8px; min-height: 50px; max-height: 150px; align-items: center; overflow-y: auto !important;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        }
 
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-}
-        .fotos-status-linha::-webkit-scrollbar { width: 0px; }
-
+        /* =========================================
+           CARDS DOS VIGILANTES
+           ========================================= */
         .vigilante-container { width: 84px; height: 106px; }
         .fotos-status-linha .vigilante-container { width: 52px !important; height: 66px !important; }
         .fotos-status-linha .vigilante-nome-tag { font-size: 7.5px !important; padding: 1px 0 !important; }
@@ -155,14 +103,20 @@ body::before {
         .vigilante-card {
             width: 100%; height: 100%; border: 2px solid #64748b; border-radius: 6px; cursor: pointer;
             background-size: cover; background-position: center; background-repeat: no-repeat;
-            background-color: #334155; position: relative; z-index: 1; filter: grayscale(100%);
+            background-color: #334155; position: relative; z-index: 2; filter: grayscale(100%);
             opacity: 0.4; transition: border-color 0.15s, filter 0.3s ease, opacity 0.3s ease;
         }
 
+        .vigilante-card:hover { border-color: #fff !important; z-index: 10; }
+        .borda-seoe { border-color: #22c55e !important; box-shadow: inset 0 0 6px #22c55e; }
         .borda-supervisor { border-color: #eab308 !important; box-shadow: inset 0 0 4px #eab308; }
         .borda-intermitente { border-color: #dc2626 !important; box-shadow: inset 0 0 4px #dc2626; }
         .borda-vigilante { border-color: #64748b; }
-        .vigilante-card:hover { border-color: #fff !important; z-index: 10; }
+
+        #container-seoe .vigilante-card, .grupo-ativo .vigilante-card, .intermitente-ativo-hoje { 
+            filter: grayscale(0%) !important; opacity: 1 !important; 
+        }
+        #container-seoe .vigilante-container > .vigilante-card > div[style*="background: rgba(0, 0, 0, 0.75)"] { display: none !important; }
 
         .vigilante-nome-tag {
             position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.75);
@@ -170,8 +124,9 @@ body::before {
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 4px 4px;
         }
 
-        .grupo-ativo .vigilante-card, .intermitente-ativo-hoje { filter: grayscale(0%) !important; opacity: 1 !important; }
-
+        /* =========================================
+           TOOLTIP
+           ========================================= */
         #global-tooltip {
             position: fixed; display: none; width: 420px; background-color: #ffffff; color: var(--text-dark);
             border: 2px solid #64748b; border-radius: 8px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
@@ -186,67 +141,24 @@ body::before {
         .tooltip-linha span:last-child { color: #0f172a; font-weight: 700; text-align: right; word-break: break-word; }
         .posto-destaque { background: #f1f5f9; padding: 5px 8px; border-radius: 4px; margin-top: 6px; border-left: 3px solid #2563eb; font-size: 11px; font-weight: bold; line-height: 1.3; }
         .status-alerta { color: #dc2626 !important; }
+
+        .cursor-none { cursor: none; }
     </style>
 </head>
 <body>
-
-<style>
-  .cursor-none {
-    cursor: none;
-  }
-</style>
-
-<script>
-	
-	const ordemGrupos = { "GRUPO A": 1, "GRUPO B": 2, "GRUPO C": 3, "GRUPO D": 4 };
-
-  let timer;
-  const tempoInatividade = 3000;
-
-  function esconderCursor() {
-    document.body.classList.add('cursor-none');
-  }
-
-  function mostrarCursor() {
-    document.body.classList.remove('cursor-none');
-    
-    clearTimeout(timer);
-    timer = setTimeout(esconderCursor, tempoInatividade);
-  }
-
-  document.addEventListener('mousemove', mostrarCursor);
-
-  timer = setTimeout(esconderCursor, tempoInatividade);
-  
-  function agendarAtualizacaoMeiaNoite() {
-    const agora = new Date();
-
-    const amanha = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1, 0, 0, 0);
-    const tempoAteMeiaNoite = amanha - agora;
-
-
-    setTimeout(() => {
-        location.reload();
-    }, tempoAteMeiaNoite);
-}
-
-// Inicializa a função
-agendarAtualizacaoMeiaNoite();
-  
-</script>
 
     <div class="header-painel">
         <div class="logo-area">ITAIPU BINACIONAL</div>
         <h1>Divisão de Segurança Externa</h1>
         <div id="data-atual" style="font-weight: 600; color: #cbd5e1;"></div>
     </div>
-	
-	<div class="area-status-superior" style="margin-bottom: 15px;">
-    <div class="linha-status">
-        <div class="label-status">SEOE</div>
-        <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px;"></div>
+    
+    <div class="area-status-superior" style="margin-bottom: 15px;">
+        <div class="linha-status">
+            <div class="label-status">SEOE</div>
+            <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px;"></div>
+        </div>
     </div>
-</div>
 
     <div class="quadro-principal">
         <div class="grade-grupos" id="grade-operacional">
@@ -265,368 +177,339 @@ agendarAtualizacaoMeiaNoite();
     </div>
 
     <div id="global-tooltip"></div>
-	
-	<script>
-
-    document.addEventListener('contextmenu', event => event.preventDefault());
-
-
-    document.onkeydown = function(e) {
-        if(e.keyCode == 123) return false; // F12
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
-        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
-    }
-</script>
 
     <script>
-        const URL_API = "https://script.google.com/macros/s/AKfycbyfMiZompnkaTl7qxAPvvNcAiP3ZmUE-KyB_WVh7K5kJnojU4tGITf8jK-2snM94RfLqw/exec";
-        const tooltipGlobal = document.getElementById('global-tooltip');
-        const grade = document.getElementById('grade-operacional');
-        const blocos = { 'bloco-grupo-a': 0, 'bloco-grupo-b': 1, 'bloco-grupo-c': 2, 'bloco-grupo-d': 3 };
-        let grupoDeServiçoAtual = "GRUPO A";
+        /* ==========================================================================
+           1. CONFIGURAÇÕES E ESTADO GERAL
+           ========================================================================== */
+        const CONFIG = {
+            URL_API: "https://script.google.com/macros/s/AKfycbyfMiZompnkaTl7qxAPvvNcAiP3ZmUE-KyB_WVh7K5kJnojU4tGITf8jK-2snM94RfLqw/exec",
+            REF_DATE: new Date(2026, 4, 21, 0, 0, 0),
+            UPDATE_INTERVAL: 5 * 60 * 1000,
+            IDLE_TIME: 3000,
+            ORDEM_GRUPOS: { "GRUPO A": 1, "GRUPO B": 2, "GRUPO C": 3, "GRUPO D": 4 },
+            BLOCOS_MAP: { 'bloco-grupo-a': 0, 'bloco-grupo-b': 1, 'bloco-grupo-c': 2, 'bloco-grupo-d': 3 }
+        };
 
+        const STATE = {
+            grupoAtivo: "GRUPO A",
+            timerCursor: null
+        };
+
+        const DOM = {
+            tooltip: document.getElementById('global-tooltip'),
+            grade: document.getElementById('grade-operacional'),
+            dataAtual: document.getElementById('data-atual')
+        };
+
+        /* ==========================================================================
+           2. SISTEMA DE PROTEÇÃO (Modo Quiosque)
+           ========================================================================== */
+        function initKioskMode() {
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.onkeydown = e => {
+                if(e.keyCode == 123) return false;
+                if(e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67)) return false;
+                if(e.ctrlKey && e.keyCode == 85) return false;
+            };
+
+            const esconderCursor = () => document.body.classList.add('cursor-none');
+            const mostrarCursor = () => {
+                document.body.classList.remove('cursor-none');
+                clearTimeout(STATE.timerCursor);
+                STATE.timerCursor = setTimeout(esconderCursor, CONFIG.IDLE_TIME);
+            };
+
+            document.addEventListener('mousemove', mostrarCursor);
+            STATE.timerCursor = setTimeout(esconderCursor, CONFIG.IDLE_TIME);
+
+            const agora = new Date();
+            const amanha = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1, 0, 0, 0);
+            setTimeout(() => location.reload(), amanha - agora);
+        }
+
+        /* ==========================================================================
+           3. MOTOR DE REGRAS DE NEGÓCIO E DADOS
+           ========================================================================== */
         function calcularGrupoDeServico() {
-    const agora = new Date();
-    const hora = agora.getHours();
-    const dataRef = new Date(2026, 4, 21, 0, 0, 0);
-    const dataHojeZerada = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
-    let diferencaTempo = dataHojeZerada.getTime() - dataRef.getTime();
-    
-    // Ajuste: Se for entre 00h e 06h, considera como parte do dia anterior para o cálculo do grupo
-    if (hora < 6) {
-        diferencaTempo -= (1000 * 60 * 60 * 24);
-    }
+            const agora = new Date();
+            const hora = agora.getHours();
+            let dataHojeZerada = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
+            let diferencaTempo = dataHojeZerada.getTime() - CONFIG.REF_DATE.getTime();
+            
+            if (hora < 6) diferencaTempo -= (1000 * 60 * 60 * 24);
 
-    const diasCorridos = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
-    
-    let grupoDefinido = (diasCorridos % 2 === 0) 
-        ? ((hora >= 6 && hora < 18) ? "GRUPO A" : "GRUPO C") 
-        : ((hora >= 6 && hora < 18) ? "GRUPO B" : "GRUPO D");
+            const diasCorridos = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+            STATE.grupoAtivo = (diasCorridos % 2 === 0) 
+                ? ((hora >= 6 && hora < 18) ? "GRUPO A" : "GRUPO C") 
+                : ((hora >= 6 && hora < 18) ? "GRUPO B" : "GRUPO D");
 
-    grupoDeServiçoAtual = grupoDefinido;
-    atualizarLayoutSanfona(grupoDefinido);
-}
+            atualizarLayoutSanfona(STATE.grupoAtivo);
+        }
 
+        function converterLinkDrive(url) {
+            if (!url) return 'https://via.placeholder.com/74x94/334155/FFFFFF?text=?';
+            const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/) || url.match(/id=([a-zA-Z0-9-_]+)/);
+            return (match && match[1]) ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200-h250` : url;
+        }
+
+        function isAniversariante(dataNascimento) {
+            if (!dataNascimento) return { status: false, idade: "" };
+            let partes = dataNascimento.split('-');
+            if (partes.length !== 3) return { status: false, idade: "" };
+            
+            let [anoNasc, mesNasc, diaNasc] = [parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2])];
+            let hoje = new Date();
+            return {
+                status: (hoje.getMonth() === mesNasc && hoje.getDate() === diaNasc),
+                idade: hoje.getFullYear() - anoNasc
+            };
+        }
+
+        /* ==========================================================================
+           4. RENDERIZAÇÃO E INTERFACE
+           ========================================================================== */
         function atualizarLayoutSanfona(nomeGrupo) {
-            let idBlocoAlvo = "bloco-grupo-a";
-            if (nomeGrupo === "GRUPO B") idBlocoAlvo = "bloco-grupo-b";
-            if (nomeGrupo === "GRUPO C") idBlocoAlvo = "bloco-grupo-c";
-            if (nomeGrupo === "GRUPO D") idBlocoAlvo = "bloco-grupo-d";
+            let idBlocoAlvo = `bloco-${nomeGrupo.replace(" ", "-").toLowerCase()}`;
+            if (!CONFIG.BLOCOS_MAP.hasOwnProperty(idBlocoAlvo)) idBlocoAlvo = "bloco-grupo-a";
 
-            let tamanhos = [0.5, 0.5, 0.5, 0.5]; tamanhos[blocos[idBlocoAlvo]] = 2.5;
-            grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
-            Object.keys(blocos).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
+            let tamanhos = [0.5, 0.5, 0.5, 0.5]; 
+            tamanhos[CONFIG.BLOCOS_MAP[idBlocoAlvo]] = 2.5;
+            
+            DOM.grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
+            
+            Object.keys(CONFIG.BLOCOS_MAP).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
             document.getElementById(idBlocoAlvo).classList.add('grupo-ativo');
             ajustarDestaqueIntermitentes();
         }
 
-
-        function converterLinkDrive(url) {
-            if (!url) return 'https://via.placeholder.com/74x94/334155/FFFFFF?text=?';
-            const matchId = url.match(/\/d\/([a-zA-Z0-9-_]+)/) || url.match(/id=([a-zA-Z0-9-_]+)/);
-            if (matchId && matchId[1]) {
-                let idArquivo = matchId[1];
-                return `https://drive.google.com/thumbnail?id=${idArquivo}&sz=w200-h250`;
-            }
-            return url;
-        }
-		
-        function aplicarImagemFundo(url, elemento, tentativasRestantes = 3) {
-            if (!url || url.includes('via.placeholder.com')) {
-                elemento.style.backgroundImage = `url('${url}')`;
-                return;
-            }
-
-            const img = new Image();
-            
-            img.onload = function() {
-                elemento.style.backgroundImage = `url('${url}')`;
-            };
-            
-            img.onerror = function() {
-                if (tentativasRestantes > 0) {
-                    setTimeout(() => aplicarImagemFundo(url, elemento, tentativasRestantes - 1), 800);
-                } else {
-                    elemento.style.backgroundImage = `url('https://via.placeholder.com/74x94/334155/FFFFFF?text=Erro')`;
-                }
-            };
-            
-            img.src = url;
+        function ajustarDestaqueIntermitentes() {
+            document.querySelectorAll('#container-intermitentes .vigilante-card').forEach(card => {
+                card.getAttribute('data-status-escala') === STATE.grupoAtivo 
+                    ? card.classList.add('intermitente-ativo-hoje') 
+                    : card.classList.remove('intermitente-ativo-hoje');
+            });
         }
 
         function limparTodosOsContainers() {
-            Object.keys(blocos).forEach(b => document.getElementById(b.replace('bloco-', 'container-')).innerHTML = '');
-            ['container-seoe', 'container-reciclagem', 'container-atestado', 'container-ferias', 'container-intermitentes'].forEach(id => {
-                const el = document.getElementById(id); if (el) el.innerHTML = '';
-            });
+            document.querySelectorAll('.zona-fotos, .fotos-status-linha').forEach(el => el.innerHTML = '');
+        }
+
+        function criarTooltipHTML(v, fotoUrl, aniversario) {
+            const formatData = d => (d && d.toString().includes('T')) ? new Date(d).toLocaleDateString('pt-BR') : d;
+            const vencAlerta = parseInt(v.diasParaVencer) <= 30 ? 'status-alerta' : '';
+            const isAfastado = v.atestado || v.ferias || v.reciclagem;
+
+            let alertasInfo = "";
+            if (aniversario.status) alertasInfo += `<div class="posto-destaque" style="border-left-color: #ec4899; background: #fdf2f8; color: #be185d;">🎂 <strong>Aniversariante do dia!</strong></div>`;
+            if (v.titularSubstituido) alertasInfo += `<div class="posto-destaque" style="border-left-color: #eab308; background: #fefce8; color: #a16207;">🔄 Substituindo: <strong>${v.titularSubstituido}</strong><br>Motivo: <strong>${v.motivoSubstituicao}</strong></div>`;
+            else if (isAfastado && v.substituto && v.substituto.trim() !== "") alertasInfo += `<div class="posto-destaque" style="border-left-color: #dc2626; background: #fef2f2; color: #b91c1c;">🔄 Substituído por:<br><strong>${v.substituto}</strong></div>`;
+
+            let historicoHtml = "";
+            if (v.historico && v.historico.length > 0) {
+                historicoHtml = `<div style="margin-top:10px; border-top:1px solid #cbd5e1; padding-top:5px;">
+                    <div style="font-size:10px; font-weight:bold; color:#475569; margin-bottom:3px;">HISTÓRICO DE POSTOS:</div>
+                    ${v.historico.map(h => `<div class="tooltip-linha" style="margin-bottom:2px;"><span>${h.data}:</span> <span>${h.posto}</span></div>`).join('')}
+                </div>`;
+            }
+
+            return `
+                <div class="tooltip-estrutura">
+                    <div class="tooltip-foto-container" style="background-image: url('${fotoUrl}');"></div>
+                    <div class="tooltip-dados">
+                        <div class="tooltip-header">${v.nome}</div>
+                        <div class="tooltip-linha"><span>Nº Posto:</span> <span>${v.numPosto || 'N/A'}</span></div>
+                        <div class="tooltip-linha"><span>Cadastro:</span> <span>${v.cadastro || 'N/A'}</span></div>
+                        <div class="tooltip-linha"><span>Cargo:</span> <span>${v.cargo || 'N/A'}</span></div>
+                        <div class="tooltip-linha"><span>Validade CNV:</span> <span>${formatData(v.validadeCnv) || 'N/A'}</span></div>
+                        <div class="tooltip-linha"><span>Validade Curso:</span> <span>${formatData(v.validadeCurso) || 'N/A'}</span></div>
+                        <div class="tooltip-linha"><span>Dias p/ Vencer:</span> <span class="${vencAlerta}">${v.diasParaVencer || '0'}</span></div>
+                        <div class="posto-destaque" style="${v.postoAtual ? '' : 'color:#64748b;'}">📍 ${v.postoAtual || 'Posto Não Definido'}</div>
+                        ${alertasInfo}
+                        <div class="tooltip-linha"><span>Ramal Posto:</span> <span>${v.ramalEscala || 'N/A'}</span></div>
+                        ${historicoHtml} 
+                    </div>
+                </div>
+            `;
         }
 
         function adicionarVigilanteNaTela(vigilante, idContainer) {
             const container = document.getElementById(idContainer);
             if (!container) return;
 
-            const isAfastadoContainer = idContainer.includes('reciclagem') || idContainer.includes('atestado') || idContainer.includes('ferias');
-            const wrapper = document.createElement('div'); wrapper.className = 'vigilante-container';
-            const card = document.createElement('div'); card.className = 'vigilante-card';
+            const isAfastado = ['container-reciclagem', 'container-atestado', 'container-ferias'].includes(idContainer);
+            const cargo = (vigilante.cargo || "").toUpperCase().trim();
             
-            const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
+            const wrapper = document.createElement('div'); 
+            wrapper.className = 'vigilante-container';
+            const card = document.createElement('div'); 
+            card.className = 'vigilante-card';
             
-            if (cargo.includes("SEOE")) {
-                card.classList.add('borda-seoe');
-            } else if (cargo === "SUPERVISOR OPERACIONAL" || cargo === "SUPERVISOR ADMINISTRATIVO" || cargo === "COORDENADOR") {
-                card.classList.add('borda-supervisor');
-            } else if (cargo === "VIGILANTE - INTERMITENTE" || cargo.includes("INTERMITENTE")) {
-                card.classList.add('borda-intermitente');
-            } else {
-                card.classList.add('borda-vigilante');
+            if (cargo.includes("SEOE")) card.classList.add('borda-seoe');
+            else if (["SUPERVISOR OPERACIONAL", "SUPERVISOR ADMINISTRATIVO", "COORDENADOR"].includes(cargo)) card.classList.add('borda-supervisor');
+            else if (cargo.includes("INTERMITENTE")) card.classList.add('borda-intermitente');
+            else card.classList.add('borda-vigilante');
+
+            card.setAttribute('data-status-escala', (vigilante.statusAtual || "").toUpperCase());
+            
+            // Controle de Imagem com Exponential Backoff
+            const fotoUrl = converterLinkDrive(vigilante.driveUrl);
+            card.style.backgroundColor = "#1e293b";
+            
+            function tentarCarregarImagem(url, elemento, tentativas = 3) {
+                if (!url || url.includes('via.placeholder.com')) {
+                    elemento.style.backgroundImage = `url('${url}')`;
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => elemento.style.backgroundImage = `url('${url}')`;
+                img.onerror = () => {
+                    if (tentativas > 0) {
+                        const tempoEspera = (4 - tentativas) * 1500; // Aguarda 1.5s, 3.0s, 4.5s
+                        setTimeout(() => tentarCarregarImagem(url, elemento, tentativas - 1), tempoEspera);
+                    } else {
+                        elemento.style.backgroundImage = `url('https://via.placeholder.com/74x94/334155/FFFFFF?text=Erro')`;
+                    }
+                };
+                img.src = url;
             }
 
-            card.setAttribute('data-status-escala', vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "");
-            const fotoUrl = converterLinkDrive(vigilante.driveUrl);
-            
-            card.style.backgroundColor = "#1e293b"; 
-            aplicarImagemFundo(fotoUrl, card);
+            tentarCarregarImagem(fotoUrl, card);
 
             const tagSuperior = document.createElement('div');
-            tagSuperior.style.position = 'absolute'; tagSuperior.style.top = '0'; tagSuperior.style.left = '0'; tagSuperior.style.right = '0';
-            tagSuperior.style.background = 'rgba(0, 0, 0, 0.75)'; tagSuperior.style.display = 'flex'; tagSuperior.style.justifyContent = 'space-between';
-            tagSuperior.style.padding = '1px 3px'; tagSuperior.style.fontSize = '14px'; tagSuperior.style.fontWeight = 'bold';
-            tagSuperior.style.color = '#fff'; tagSuperior.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+            tagSuperior.style.cssText = 'position:absolute; top:0; left:0; right:0; background:rgba(0,0,0,0.75); display:flex; justify-content:space-between; padding:1px 3px; font-size:14px; font-weight:bold; color:#fff; border-bottom:1px solid rgba(255,255,255,0.1);';
+            tagSuperior.innerHTML = `
+                <span style="color:${isAfastado ? '#fbbf24' : 'inherit'};">${isAfastado ? (vigilante.grupoPuro || "-") : (vigilante.numPosto || "-")}</span>
+                <span style="color:#94a3b8;">${vigilante.ramalEscala ? "📞" + vigilante.ramalEscala : ""}</span>
+            `;
+            card.appendChild(tagSuperior);
 
-const spanPosto = document.createElement('span');
-if (isAfastadoContainer) {
-    spanPosto.innerText = vigilante.grupoPuro || "-"; 
-    spanPosto.style.color = "#fbbf24";
-} else {
-    spanPosto.innerText = vigilante.numPosto || "-";
-}
-            
-            const spanRamal = document.createElement('span');
-            spanRamal.innerText = vigilante.ramalEscala ? "📞" + vigilante.ramalEscala : ""; spanRamal.style.color = '#94a3b8';
-
-            tagSuperior.appendChild(spanPosto); tagSuperior.appendChild(spanRamal); card.appendChild(tagSuperior);
-
-            let isAniversario = false; let idade = "";
-            if (vigilante.dataNascimento) {
-                let partes = vigilante.dataNascimento.split('-');
-                if (partes.length === 3) {
-                    let anoNasc = parseInt(partes[0]); let mesNasc = parseInt(partes[1]) - 1; let diaNasc = parseInt(partes[2]);
-                    let hoje = new Date();
-                    if (hoje.getMonth() === mesNasc && hoje.getDate() === diaNasc) {
-                        isAniversario = true; idade = hoje.getFullYear() - anoNasc;
-                    }
-                }
-            }
-
-            if (isAniversario) {
+            const aniversario = isAniversariante(vigilante.dataNascimento);
+            if (aniversario.status) {
                 const balao = document.createElement('div');
                 balao.innerText = "🎈";
-                balao.style.position = 'absolute'; balao.style.top = '-8px'; balao.style.right = '-8px';
-                balao.style.fontSize = '20px'; balao.style.zIndex = '20'; balao.style.filter = 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))';
+                balao.style.cssText = 'position:absolute; top:-8px; right:-8px; font-size:20px; z-index:20; filter:drop-shadow(0px 2px 2px rgba(0,0,0,0.5));';
                 card.appendChild(balao);
             }
 
             const tagNome = document.createElement('div');
             tagNome.className = 'vigilante-nome-tag';
             tagNome.innerText = vigilante.nomeExibicao || vigilante.nome.split(' ')[0] || "Vigilante";
-			card.appendChild(tagNome);
+            card.appendChild(tagNome);
 
-            card.addEventListener('mouseenter', (e) => {
-    const classeVencimento = parseInt(vigilante.diasParaVencer) <= 30 ? 'status-alerta' : '';
-    const postoFormatado = vigilante.postoAtual ? `<div class="posto-destaque">📍 ${vigilante.postoAtual}</div>` : '<div class="posto-destaque" style="color:#64748b;">📍 Posto Não Definido</div>';
-    const formatarData = (data) => data && data.toString().includes('T') ? new Date(data).toLocaleDateString('pt-BR') : data;
-
-    let linhaInformativa = "";
-    let linhaAniversario = "";
-
-    if (isAniversario) {
-        linhaAniversario = `<div class="posto-destaque" style="border-left-color: #ec4899; background: #fdf2f8; color: #be185d;">🎂 <strong>Aniversariante do dia!</strong></div>`;
-    }
-
-    if (vigilante.titularSubstituido) {
-        linhaInformativa = `<div class="posto-destaque" style="border-left-color: #eab308; background: #fefce8; color: #a16207;">🔄 Substituindo: <strong>${vigilante.titularSubstituido}</strong><br>Motivo: <strong>${vigilante.motivoSubstituicao}</strong></div>`;
-    } else if (isAfastadoContainer && vigilante.substituto && vigilante.substituto.trim() !== "") {
-        linhaInformativa = `<div class="posto-destaque" style="border-left-color: #dc2626; background: #fef2f2; color: #b91c1c;">🔄 Substituído por:<br><strong>${vigilante.substituto}</strong></div>`;
-    }
-
-    // A lógica do histórico que você precisa:
-    let linhasHistorico = "";
-    if (vigilante.historico && vigilante.historico.length > 0) {
-        linhasHistorico = `<div style="margin-top:10px; border-top:1px solid #cbd5e1; padding-top:5px;">
-            <div style="font-size:10px; font-weight:bold; color:#475569; margin-bottom:3px;">HISTÓRICO DE POSTOS:</div>
-            ${vigilante.historico.map(h => `
-                <div class="tooltip-linha" style="margin-bottom:2px;">
-                    <span>${h.data}:</span> <span>${h.posto}</span>
-                </div>
-            `).join('')}
-        </div>`;
-    }
-
-    tooltipGlobal.innerHTML = `
-        <div class="tooltip-estrutura">
-            <div class="tooltip-foto-container" style="background-image: url('${fotoUrl}');"></div>
-            <div class="tooltip-dados">
-                <div class="tooltip-header">${vigilante.nome}</div>
-                <div class="tooltip-linha"><span>Nº Posto:</span> <span>${vigilante.numPosto || 'N/A'}</span></div>
-                <div class="tooltip-linha"><span>Cadastro:</span> <span>${vigilante.cadastro || 'N/A'}</span></div>
-                <div class="tooltip-linha"><span>Cargo:</span> <span>${vigilante.cargo || 'N/A'}</span></div>
-                <div class="tooltip-linha"><span>Validade CNV:</span> <span>${formatarData(vigilante.validadeCnv) || 'N/A'}</span></div>
-                <div class="tooltip-linha"><span>Validade Curso:</span> <span>${formatarData(vigilante.validadeCurso) || 'N/A'}</span></div>
-                <div class="tooltip-linha"><span>Dias p/ Vencer:</span> <span class="${classeVencimento}">${vigilante.diasParaVencer || '0'}</span></div>
-                ${postoFormatado}
-                ${linhaAniversario}
-                ${linhaInformativa}
-                <div class="tooltip-linha"><span>Ramal Posto:</span> <span>${vigilante.ramalEscala || 'N/A'}</span></div>
-                ${linhasHistorico} 
-            </div>
-        </div>
-    `;
-    tooltipGlobal.style.display = 'block';
-});
-
+            card.addEventListener('mouseenter', () => {
+                DOM.tooltip.innerHTML = criarTooltipHTML(vigilante, fotoUrl, aniversario);
+                DOM.tooltip.style.display = 'block';
+            });
             card.addEventListener('mousemove', (e) => {
-                const larguraTooltip = 440; const alturaTooltip = tooltipGlobal.offsetHeight || 230; 
-                let posX = e.clientX + 20; let posY = e.clientY - 40;
-                if (posX + larguraTooltip > window.innerWidth) posX = e.clientX - larguraTooltip - 10;
-                if (posY + alturaTooltip > window.innerHeight) posY = e.clientY - alturaTooltip + 10;
-                if (posY < 10) posY = 10;
-                tooltipGlobal.style.left = posX + 'px'; tooltipGlobal.style.top = posY + 'px';
+                const w = 440, h = DOM.tooltip.offsetHeight || 230;
+                let x = e.clientX + 20, y = e.clientY - 40;
+                if (x + w > window.innerWidth) x = e.clientX - w - 10;
+                if (y + h > window.innerHeight) y = e.clientY - h + 10;
+                DOM.tooltip.style.left = `${x}px`; DOM.tooltip.style.top = `${Math.max(y, 10)}px`;
             });
+            card.addEventListener('mouseleave', () => DOM.tooltip.style.display = 'none');
 
-            card.addEventListener('mouseleave', () => { tooltipGlobal.style.display = 'none'; });
-            wrapper.appendChild(card); container.appendChild(wrapper);
+            wrapper.appendChild(card);
+            container.appendChild(wrapper);
         }
 
-        function ajustarDestaqueIntermitentes() {
-            const cardsIntermitentes = document.querySelectorAll('#container-intermitentes .vigilante-card');
-            cardsIntermitentes.forEach(card => {
-                card.getAttribute('data-status-escala') === grupoDeServiçoAtual ? card.classList.add('intermitente-ativo-hoje') : card.classList.remove('intermitente-ativo-hoje');
-            });
-        }
-
-function puxarDadosDoSheets() {
-    fetch(URL_API)
-        .then(response => response.json())
-        .then(listaVigilantes => {
-            limparTodosOsContainers();
-
-            let mapaDadosGeral = {};
-            let detalhesSubstitutos = {}; 
-
-            listaVigilantes.forEach(v => { 
-                if (v.nome) mapaDadosGeral[v.nome.toUpperCase().trim()] = v; 
+        /* ==========================================================================
+           5. ORQUESTRAÇÃO DE DADOS E ROTEAMENTO
+           ========================================================================== */
+        async function puxarDadosDoSheets() {
+            try {
+                const response = await fetch(CONFIG.URL_API);
+                const listaBruta = await response.json();
                 
-                if ((v.atestado || v.ferias || v.reciclagem) && v.substituto && v.substituto.trim() !== "") {
-                    let chaveSub = v.substituto.toUpperCase().trim();
-                    let grupoDoTitular = v.statusAtual ? v.statusAtual.toUpperCase().trim() : "";
-                    let motivo = v.ferias ? "Férias" : v.atestado ? "Atestado" : "Reciclagem";
+                limparTodosOsContainers();
 
-                    detalhesSubstitutos[chaveSub] = {
-                        grupo: grupoDoTitular,
-                        titularSubstituido: v.nome,
-                        motivoSubstituicao: motivo
-                    };
-                }
-            });
+                const mapaDadosGeral = {};
+                const mapaSubstitutos = {}; 
 
-            let listaSeoe = listaVigilantes.filter(v => v.cargo && v.cargo.toUpperCase().includes("SEOE"));
-            listaSeoe.sort((a, b) => a.dataAdmissao - b.dataAdmissao);
-            listaSeoe.forEach(vigilante => adicionarVigilanteNaTela(vigilante, 'container-seoe'));
+                listaBruta.forEach(v => { 
+                    const nomeUpper = (v.nome || "").toUpperCase().trim();
+                    if (nomeUpper) mapaDadosGeral[nomeUpper] = v; 
+                    
+                    if ((v.atestado || v.ferias || v.reciclagem) && v.substituto && v.substituto.trim() !== "") {
+                        mapaSubstitutos[v.substituto.toUpperCase().trim()] = {
+                            grupo: (v.statusAtual || "").toUpperCase().trim(),
+                            titularSubstituido: v.nome,
+                            motivoSubstituicao: v.ferias ? "Férias" : v.atestado ? "Atestado" : "Reciclagem"
+                        };
+                    }
+                });
 
-           // 1. ISOLAMOS E ORDENAMOS APENAS OS AFASTADOS
-let listaAfastados = listaVigilantes.filter(v => v.atestado || v.ferias || v.reciclagem);
-listaAfastados.sort((a, b) => {
-    let grupoA = (a.statusAtual || "").toUpperCase();
-    let grupoB = (b.statusAtual || "").toUpperCase();
-    return (ordemGrupos[grupoA] || 99) - (ordemGrupos[grupoB] || 99);
-});
+                // SEOE
+                listaBruta.filter(v => v.cargo && v.cargo.toUpperCase().includes("SEOE"))
+                          .sort((a, b) => a.dataAdmissao - b.dataAdmissao)
+                          .forEach(v => adicionarVigilanteNaTela(v, 'container-seoe'));
 
-// 2. DESENHAMOS OS AFASTADOS NA TELA (AGORA EM ORDEM A, B, C, D)
-listaAfastados.forEach(vigilante => {
-    if (vigilante.reciclagem) adicionarVigilanteNaTela(vigilante, 'container-reciclagem');
-    else if (vigilante.atestado) adicionarVigilanteNaTela(vigilante, 'container-atestado');
-    else if (vigilante.ferias) adicionarVigilanteNaTela(vigilante, 'container-ferias');
-});
+                // AFASTADOS (Ordenados por Grupo)
+                const afastados = listaBruta.filter(v => v.atestado || v.ferias || v.reciclagem);
+                afastados.sort((a, b) => (CONFIG.ORDEM_GRUPOS[a.statusAtual?.toUpperCase()] || 99) - (CONFIG.ORDEM_GRUPOS[b.statusAtual?.toUpperCase()] || 99));
+                afastados.forEach(v => {
+                    const idContainer = v.reciclagem ? 'container-reciclagem' : v.atestado ? 'container-atestado' : 'container-ferias';
+                    adicionarVigilanteNaTela(v, idContainer);
+                });
 
-// 3. SEU LOOP ORIGINAL: MANTIDO INTACTO PARA ATIVOS E SUBSTITUTOS
-listaVigilantes.forEach(vigilante => {
-    if (vigilante.cargo && vigilante.cargo.toUpperCase().includes("SEOE")) return;
+                // ATIVOS E SUBSTITUTOS (Ordenados por Posto)
+                const ativos = listaBruta.filter(v => !(v.atestado || v.ferias || v.reciclagem) && !(v.cargo && v.cargo.toUpperCase().includes("SEOE")));
+                ativos.sort((a, b) => parseInt((a.numPosto || "").toString().replace(/\D/g, '')) - parseInt((b.numPosto || "").toString().replace(/\D/g, '')));
+                
+                ativos.forEach(v => {
+                    const status = (v.statusAtual || "").toUpperCase();
+                    const cargo = (v.cargo || "").toUpperCase().trim();
+                    const nomeUpper = (v.nome || "").toUpperCase().trim();
+                    let vigilanteTratado = { ...v };
 
-    const status = vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "";
-    const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
-    const nomeChave = vigilante.nome ? vigilante.nome.toUpperCase().trim() : "";
- 
-    if (vigilante.atestado || vigilante.ferias || vigilante.reciclagem) {
-        // A RENDERIZAÇÃO DELES JÁ FOI FEITA LÁ EM CIMA. 
-        // AQUI DENTRO AGORA SÓ CUIDAMOS DE COLOCAR O SUBSTITUTO DELES NO GRUPO CERTO.
-        if (vigilante.substituto && vigilante.substituto.trim() !== "") {
-            let chaveSub = vigilante.substituto.toUpperCase().trim();
-            let dadosReaisSub = mapaDadosGeral[chaveSub];
-            let cloneSub = { ...vigilante, ...dadosReaisSub, nome: vigilante.substituto.trim() };
-            
-            if (detalhesSubstitutos[chaveSub]) {
-                cloneSub.titularSubstituido = detalhesSubstitutos[chaveSub].titularSubstituido;
-                cloneSub.motivoSubstituicao = detalhesSubstitutos[chaveSub].motivoSubstituicao;
+                    if (mapaSubstitutos[nomeUpper]) {
+                        vigilanteTratado.statusAtual = mapaSubstitutos[nomeUpper].grupo;
+                        vigilanteTratado.titularSubstituido = mapaSubstitutos[nomeUpper].titularSubstituido;
+                        vigilanteTratado.motivoSubstituicao = mapaSubstitutos[nomeUpper].motivoSubstituicao;
+                    }
+
+                    if (cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
+                        adicionarVigilanteNaTela(vigilanteTratado, 'container-intermitentes');
+                    } else if (mapaSubstitutos[nomeUpper] || !mapaSubstitutos[nomeUpper]) {
+                        const st = vigilanteTratado.statusAtual || "";
+                        if (st.includes("GRUPO A")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-a');
+                        else if (st.includes("GRUPO B")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-b');
+                        else if (st.includes("GRUPO C")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-c');
+                        else if (st.includes("GRUPO D")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-d');
+                    }
+                });
+
+                ajustarDestaqueIntermitentes();
+
+            } catch (error) {
+                console.error("Erro Crítico ao processar dados da API:", error);
+                // Previsão de ajuste futuro: Exibir alerta na tela se a internet cair.
             }
-            
-            if (status.includes("GRUPO A")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-a');
-            else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-b');
-            else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-c');
-            else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-d');
         }
-    } else {
-        // PESSOAL ATIVO: CAI NA SUA LÓGICA ORIGINAL E A ORDEM DOS POSTOS FICA INTACTA
-        if (!detalhesSubstitutos[nomeChave]) {
-            if (status.includes("GRUPO A")) adicionarVigilanteNaTela(vigilante, 'container-grupo-a');
-            else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(vigilante, 'container-grupo-b');
-            else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(vigilante, 'container-grupo-c');
-            else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(vigilante, 'container-grupo-d');
-        }
-    }
 
-    if (cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
-        if (detalhesSubstitutos[nomeChave]) {
-            vigilante.statusAtual = detalhesSubstitutos[nomeChave].grupo;
-            vigilante.titularSubstituido = detalhesSubstitutos[nomeChave].titularSubstituido;
-            vigilante.motivoSubstituicao = detalhesSubstitutos[nomeChave].motivoSubstituicao;
-        }
-        adicionarVigilanteNaTela(vigilante, 'container-intermitentes');
-    }
-});
-            ajustarDestaqueIntermitentes();
-        })
-        .catch(error => console.error("Erro ao processar dados:", error));
-}
+        /* ==========================================================================
+           6. INICIALIZAÇÃO
+           ========================================================================== */
+        Object.keys(CONFIG.BLOCOS_MAP).forEach(idBloco => {
+            const el = document.getElementById(idBloco);
+            let hoverTimer;
+            el.addEventListener('mouseenter', () => {
+                hoverTimer = setTimeout(() => atualizarLayoutSanfona(idBloco.replace('bloco-', '').replace('-', ' ')), 200);
+            });
+            el.addEventListener('mouseleave', () => clearTimeout(hoverTimer));
+        });
 
-
-Object.keys(blocos).forEach(idBloco => {
-    const elemento = document.getElementById(idBloco);
-    let hoverTimer;
-
-    elemento.addEventListener('mouseenter', () => {
-        hoverTimer = setTimeout(() => {
-            let tamanhos = [0.5, 0.5, 0.5, 0.5]; 
-            tamanhos[blocos[idBloco]] = 2.5;
-            grade.style.gridTemplateColumns = tamanhos.map(t => `${t}fr`).join(' ');
-            
-            Object.keys(blocos).forEach(b => document.getElementById(b).classList.remove('grupo-ativo'));
-            elemento.classList.add('grupo-ativo');
-            grupoDeServiçoAtual = idBloco.replace('bloco-','').replace('-',' ').toUpperCase();
-            ajustarDestaqueIntermitentes();
-        }, 200);
-    });
-
-    elemento.addEventListener('mouseleave', () => {
-        clearTimeout(hoverTimer);
-    });
-});
-
-        grade.addEventListener('mouseleave', () => { calcularGrupoDeServico(); });
-        document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        DOM.grade.addEventListener('mouseleave', calcularGrupoDeServico);
         
-        calcularGrupoDeServico(); puxarDadosDoSheets();
-        setInterval(calcularGrupoDeServico, 60 * 1000); setInterval(puxarDadosDoSheets, 5 * 60 * 1000);
+        DOM.dataAtual.innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        initKioskMode();
+        calcularGrupoDeServico(); 
+        puxarDadosDoSheets();
+        
+        setInterval(calcularGrupoDeServico, 60 * 1000); 
+        setInterval(puxarDadosDoSheets, CONFIG.UPDATE_INTERVAL);
+
     </script>
 </body>
 </html>
