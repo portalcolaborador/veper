@@ -197,6 +197,7 @@ body::before {
 </style>
 
 <script>
+	
 	const ordemGrupos = { "GRUPO A": 1, "GRUPO B": 2, "GRUPO C": 3, "GRUPO D": 4 };
 
   let timer;
@@ -513,7 +514,6 @@ function puxarDadosDoSheets() {
             let mapaDadosGeral = {};
             let detalhesSubstitutos = {}; 
 
-            // Mapeamento inicial
             listaVigilantes.forEach(v => { 
                 if (v.nome) mapaDadosGeral[v.nome.toUpperCase().trim()] = v; 
                 
@@ -530,64 +530,70 @@ function puxarDadosDoSheets() {
                 }
             });
 
-            // 1. Processar SEOE (Regra específica)
             let listaSeoe = listaVigilantes.filter(v => v.cargo && v.cargo.toUpperCase().includes("SEOE"));
             listaSeoe.sort((a, b) => a.dataAdmissao - b.dataAdmissao);
             listaSeoe.forEach(vigilante => adicionarVigilanteNaTela(vigilante, 'container-seoe'));
 
-            // 2. Processar afastados (Férias, Atestado, Reciclagem) - ORDENADOS
-            let afastados = listaVigilantes.filter(v => v.atestado || v.ferias || v.reciclagem);
-            afastados.sort((a, b) => {
-                let grupoA = (a.statusAtual || "").toUpperCase();
-                let grupoB = (b.statusAtual || "").toUpperCase();
-                return (ordemGrupos[grupoA] || 99) - (ordemGrupos[grupoB] || 99);
-            });
+           // 1. ISOLAMOS E ORDENAMOS APENAS OS AFASTADOS
+let listaAfastados = listaVigilantes.filter(v => v.atestado || v.ferias || v.reciclagem);
+listaAfastados.sort((a, b) => {
+    let grupoA = (a.statusAtual || "").toUpperCase();
+    let grupoB = (b.statusAtual || "").toUpperCase();
+    return (ordemGrupos[grupoA] || 99) - (ordemGrupos[grupoB] || 99);
+});
 
-            afastados.forEach(vigilante => {
-                if (vigilante.reciclagem) adicionarVigilanteNaTela(vigilante, 'container-reciclagem');
-                else if (vigilante.atestado) adicionarVigilanteNaTela(vigilante, 'container-atestado');
-                else if (vigilante.ferias) adicionarVigilanteNaTela(vigilante, 'container-ferias');
-                
-                if (vigilante.substituto && vigilante.substituto.trim() !== "") {
-                    let chaveSub = vigilante.substituto.toUpperCase().trim();
-                    let dadosReaisSub = mapaDadosGeral[chaveSub];
-                    let cloneSub = { ...vigilante, ...dadosReaisSub, nome: vigilante.substituto.trim() };
-                    
-                    if (detalhesSubstitutos[chaveSub]) {
-                        cloneSub.titularSubstituido = detalhesSubstitutos[chaveSub].titularSubstituido;
-                        cloneSub.motivoSubstituicao = detalhesSubstitutos[chaveSub].motivoSubstituicao;
-                    }
-                    
-                    let status = (cloneSub.statusAtual || "").toUpperCase();
-                    if (status.includes("GRUPO A")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-a');
-                    else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-b');
-                    else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-c');
-                    else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-d');
-                }
-            });
+// 2. DESENHAMOS OS AFASTADOS NA TELA (AGORA EM ORDEM A, B, C, D)
+listaAfastados.forEach(vigilante => {
+    if (vigilante.reciclagem) adicionarVigilanteNaTela(vigilante, 'container-reciclagem');
+    else if (vigilante.atestado) adicionarVigilanteNaTela(vigilante, 'container-atestado');
+    else if (vigilante.ferias) adicionarVigilanteNaTela(vigilante, 'container-ferias');
+});
 
-            // 3. Processar pessoal em atividade
-            listaVigilantes.filter(v => !(v.atestado || v.ferias || v.reciclagem) && !(v.cargo && v.cargo.toUpperCase().includes("SEOE"))).forEach(vigilante => {
-                const status = vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "";
-                const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
-                const nomeChave = vigilante.nome ? vigilante.nome.toUpperCase().trim() : "";
+// 3. SEU LOOP ORIGINAL: MANTIDO INTACTO PARA ATIVOS E SUBSTITUTOS
+listaVigilantes.forEach(vigilante => {
+    if (vigilante.cargo && vigilante.cargo.toUpperCase().includes("SEOE")) return;
 
-                if (!detalhesSubstitutos[nomeChave]) {
-                    if (status.includes("GRUPO A")) adicionarVigilanteNaTela(vigilante, 'container-grupo-a');
-                    else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(vigilante, 'container-grupo-b');
-                    else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(vigilante, 'container-grupo-c');
-                    else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(vigilante, 'container-grupo-d');
-                }
+    const status = vigilante.statusAtual ? vigilante.statusAtual.toUpperCase() : "";
+    const cargo = vigilante.cargo ? vigilante.cargo.toUpperCase().trim() : "";
+    const nomeChave = vigilante.nome ? vigilante.nome.toUpperCase().trim() : "";
+ 
+    if (vigilante.atestado || vigilante.ferias || vigilante.reciclagem) {
+        // A RENDERIZAÇÃO DELES JÁ FOI FEITA LÁ EM CIMA. 
+        // AQUI DENTRO AGORA SÓ CUIDAMOS DE COLOCAR O SUBSTITUTO DELES NO GRUPO CERTO.
+        if (vigilante.substituto && vigilante.substituto.trim() !== "") {
+            let chaveSub = vigilante.substituto.toUpperCase().trim();
+            let dadosReaisSub = mapaDadosGeral[chaveSub];
+            let cloneSub = { ...vigilante, ...dadosReaisSub, nome: vigilante.substituto.trim() };
+            
+            if (detalhesSubstitutos[chaveSub]) {
+                cloneSub.titularSubstituido = detalhesSubstitutos[chaveSub].titularSubstituido;
+                cloneSub.motivoSubstituicao = detalhesSubstitutos[chaveSub].motivoSubstituicao;
+            }
+            
+            if (status.includes("GRUPO A")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-a');
+            else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-b');
+            else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-c');
+            else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(cloneSub, 'container-grupo-d');
+        }
+    } else {
+        // PESSOAL ATIVO: CAI NA SUA LÓGICA ORIGINAL E A ORDEM DOS POSTOS FICA INTACTA
+        if (!detalhesSubstitutos[nomeChave]) {
+            if (status.includes("GRUPO A")) adicionarVigilanteNaTela(vigilante, 'container-grupo-a');
+            else if (status.includes("GRUPO B")) adicionarVigilanteNaTela(vigilante, 'container-grupo-b');
+            else if (status.includes("GRUPO C")) adicionarVigilanteNaTela(vigilante, 'container-grupo-c');
+            else if (status.includes("GRUPO D")) adicionarVigilanteNaTela(vigilante, 'container-grupo-d');
+        }
+    }
 
-                if (cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
-                    if (detalhesSubstitutos[nomeChave]) {
-                        vigilante.statusAtual = detalhesSubstitutos[nomeChave].grupo;
-                        vigilante.titularSubstituido = detalhesSubstitutos[nomeChave].titularSubstituido;
-                        vigilante.motivoSubstituicao = detalhesSubstitutos[nomeChave].motivoSubstituicao;
-                    }
-                    adicionarVigilanteNaTela(vigilante, 'container-intermitentes');
-                }
-            });
+    if (cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
+        if (detalhesSubstitutos[nomeChave]) {
+            vigilante.statusAtual = detalhesSubstitutos[nomeChave].grupo;
+            vigilante.titularSubstituido = detalhesSubstitutos[nomeChave].titularSubstituido;
+            vigilante.motivoSubstituicao = detalhesSubstitutos[nomeChave].motivoSubstituicao;
+        }
+        adicionarVigilanteNaTela(vigilante, 'container-intermitentes');
+    }
+});
             ajustarDestaqueIntermitentes();
         })
         .catch(error => console.error("Erro ao processar dados:", error));
