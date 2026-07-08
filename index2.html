@@ -179,6 +179,19 @@
     <div id="global-tooltip"></div>
 
     <script>
+	
+	function agendarAtualizacaoMeiaNoite() {
+    const agora = new Date();
+    const amanha = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1, 1, 0, 0);
+    const tempoAteMeiaNoite = amanha - agora;
+    
+    setTimeout(() => {
+        location.reload();
+    }, tempoAteMeiaNoite);
+}
+
+agendarAtualizacaoMeiaNoite();
+	
         /* ==========================================================================
            1. CONFIGURAÇÕES E ESTADO GERAL
            ========================================================================== */
@@ -453,7 +466,7 @@
                     adicionarVigilanteNaTela(v, idContainer);
                 });
 
-                // ATIVOS E SUBSTITUTOS (Ordenados por Posto)
+                // ROTEAMENTO 3: ATIVOS E SUBSTITUTOS (Ordenados por Posto)
                 const ativos = listaBruta.filter(v => !(v.atestado || v.ferias || v.reciclagem) && !(v.cargo && v.cargo.toUpperCase().includes("SEOE")));
                 ativos.sort((a, b) => parseInt((a.numPosto || "").toString().replace(/\D/g, '')) - parseInt((b.numPosto || "").toString().replace(/\D/g, '')));
                 
@@ -463,20 +476,23 @@
                     const nomeUpper = (v.nome || "").toUpperCase().trim();
                     let vigilanteTratado = { ...v };
 
+                    // 1. INJETA DADOS DO TITULAR SE ELE FOR UM SUBSTITUTO
                     if (mapaSubstitutos[nomeUpper]) {
                         vigilanteTratado.statusAtual = mapaSubstitutos[nomeUpper].grupo;
                         vigilanteTratado.titularSubstituido = mapaSubstitutos[nomeUpper].titularSubstituido;
                         vigilanteTratado.motivoSubstituicao = mapaSubstitutos[nomeUpper].motivoSubstituicao;
                     }
 
+                    // 2. TODOS OS ATIVOS (Substitutos ou não, Intermitentes ou não) VÃO PARA A GRADE DE POSTOS
+                    const st = vigilanteTratado.statusAtual || "";
+                    if (st.includes("GRUPO A")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-a');
+                    else if (st.includes("GRUPO B")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-b');
+                    else if (st.includes("GRUPO C")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-c');
+                    else if (st.includes("GRUPO D")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-d');
+
+                    // 3. SE FOR INTERMITENTE, É DUPLICADO PARA O CONTAINER INFERIOR DE CONTROLE
                     if (cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
                         adicionarVigilanteNaTela(vigilanteTratado, 'container-intermitentes');
-                    } else if (mapaSubstitutos[nomeUpper] || !mapaSubstitutos[nomeUpper]) {
-                        const st = vigilanteTratado.statusAtual || "";
-                        if (st.includes("GRUPO A")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-a');
-                        else if (st.includes("GRUPO B")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-b');
-                        else if (st.includes("GRUPO C")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-c');
-                        else if (st.includes("GRUPO D")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-d');
                     }
                 });
 
