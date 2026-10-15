@@ -205,23 +205,25 @@
         <div id="data-atual" style="font-weight: 600; color: #cbd5e1;"></div>
     </div>
     
-    <div class="area-status-superior" style="margin-bottom: 15px;">
-        <!-- Novo Grid de 3 colunas: Label (180px) | Fotos SEOE (livre) | Rádio (380px) -->
-        <div style="display: grid; grid-template-columns: 180px 1fr 380px; gap: 12px; align-items: center;">
+    <div class="area-status-superior" style="margin-bottom: 15px; background: transparent !important; backdrop-filter: none !important; border: none !important;">
+        
+        <div style="display: grid; grid-template-columns: 180px 1fr 380px; gap: 12px; align-items: stretch;">
             
-            <div class="label-status">SEOE</div>
+            <div class="label-status" style="display: flex; align-items: center; justify-content: center;">SEOE</div>
             
-            <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px;"></div>
+            <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px; margin: 0;"></div>
             
             <!-- Caixinha do Rádio -->
-            <div style="height: 76px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px); overflow: hidden; display: flex; align-items: center;">
+            <div style="height: 70px !important; align-self: center; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; overflow: hidden; position: relative;">
+                
                 <iframe 
-                    src="https://radios.live/radio/jovem-pan-news-foz-do-iguacu-105-1-219714?widget=1&amp;maxWidth=1000&amp;maxHeight=0&amp;radius=0&amp;responsive=true&amp;compact=true&amp;target=_blank&amp;rel=follow&amp;preset=transparent&amp;bg=%230F172A&amp;text=%23f8fafc&amp;secondary=%2394a3b8&amp;accent=%232563eb&amp;shadow=false&amp;borderWidth=0&amp;borderColor=transparent&amp;innerBorderWidth=0&amp;innerBorderColor=transparent&amp;type=player&amp;showMetadata=true&amp;showNowPlaying=false&amp;showArtwork=true&amp;autoplay=true" 
+                    src="https://radios.live/radio/jovem-pan-news-foz-do-iguacu-105-1-219714?widget=1&amp;maxWidth=1000&amp;maxHeight=0&amp;radius=0&amp;responsive=true&amp;compact=true&amp;target=_blank&amp;rel=follow&amp;bg=%230F172A&amp;text=%23f8fafc&amp;secondary=%2394a3b8&amp;accent=%232563eb&amp;shadow=false&amp;borderWidth=0&amp;type=player&amp;showMetadata=true&amp;showNowPlaying=false&amp;showArtwork=true&amp;autoplay=true&amp;powered=hidden" 
                     title="Rádio Jovem Pan" 
-                    width="100%" height="76" 
-                    style="display:block; border:none; background:transparent;" 
-                    allowtransparency="true" loading="lazy" allow="autoplay; fullscreen">
+                    scrolling="no"
+                    style="position: absolute; top: -4px; left: -4px; width: calc(100% + 8px); height: 90px; border: none !important; outline: none !important; background: transparent;" 
+                    allow="autoplay; fullscreen">
                 </iframe>
+                
             </div>
 
         </div>
