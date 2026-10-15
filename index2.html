@@ -108,15 +108,20 @@
         .fotos-status-linha .vigilante-card div[style*="position: absolute"] span { font-size: 7px !important; }
 		
 		.grupo-ativo .zona-fotos {
-            /* Distribui as fotos preenchendo o espaço para evitar rolagem */
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-            grid-auto-rows: 130px; /* Aumenta a altura para ficar mais visível de longe */
+            /* Reduzido de 100px para 82px. Isso acomoda mais colunas lado a lado e evita criar muitas linhas verticais */
+            grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); 
+            grid-auto-rows: max-content; /* A altura da linha agora abraça o card automaticamente */
             justify-items: stretch;
+            align-content: start;
             gap: 6px;
         }
         
         /* O card ativo cresce para preencher a nova grade maior */
-        .grupo-ativo .vigilante-container { width: 100%; height: 100%; }
+        .grupo-ativo .vigilante-container { 
+            width: 100%; 
+            height: auto; 
+            aspect-ratio: 3 / 4; /* Trava o formato retrato. A foto e a tarja do nome nunca mais serão cortadas! */
+        }
         
         .fotos-status-linha .vigilante-container { width: 52px !important; height: 66px !important; }
 
