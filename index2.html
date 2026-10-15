@@ -205,17 +205,21 @@
         <div id="data-atual" style="font-weight: 600; color: #cbd5e1;"></div>
     </div>
     
-    <div class="area-status-superior" style="margin-bottom: 15px; background: transparent !important; backdrop-filter: none !important; border: none !important;">
+    <div class="area-status-superior" style="margin-bottom: 15px;">
         
-        <div style="display: grid; grid-template-columns: 180px 1fr 380px; gap: 12px; align-items: stretch;">
+        <!-- Mantemos a linha-status original, mas alteramos o grid para 3 colunas -->
+        <div class="linha-status" style="grid-template-columns: 180px 1fr 380px;">
             
-            <div class="label-status" style="display: flex; align-items: center; justify-content: center;">SEOE</div>
+            <!-- Etiqueta SEOE 100% ORIGINAL (compacta e cinza escuro) -->
+            <div class="label-status">SEOE</div>
             
-            <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px; margin: 0;"></div>
+            <!-- Caixa de Fotos SEOE 100% ORIGINAL -->
+            <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px;"></div>
             
             <!-- Caixinha do Rádio -->
-            <div style="height: 70px !important; align-self: center; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; overflow: hidden; position: relative;">
+            <div style="height: 70px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; overflow: hidden; position: relative;">
                 
+                <!-- Iframe com 90px para cortar a borda original, sem ativar o fundo branco extra do widget -->
                 <iframe 
                     src="https://radios.live/radio/jovem-pan-news-foz-do-iguacu-105-1-219714?widget=1&amp;maxWidth=1000&amp;maxHeight=0&amp;radius=0&amp;responsive=true&amp;compact=true&amp;target=_blank&amp;rel=follow&amp;bg=%230F172A&amp;text=%23f8fafc&amp;secondary=%2394a3b8&amp;accent=%232563eb&amp;shadow=false&amp;borderWidth=0&amp;type=player&amp;showMetadata=true&amp;showNowPlaying=false&amp;showArtwork=true&amp;autoplay=true&amp;powered=hidden" 
                     title="Rádio Jovem Pan" 
@@ -224,6 +228,8 @@
                     allow="autoplay; fullscreen">
                 </iframe>
                 
+                <!-- Fita de camuflagem de 6px para blindar a renderização do zoom a 150% -->
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 6px; background: #0f172a; pointer-events: none;"></div>
             </div>
 
         </div>
