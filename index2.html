@@ -6,10 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carômetro Operacional - Segurança Externa</title>
     <style>
-	
-        /* =========================================
-           ESTILOS GERAIS E FUNDO
-           ========================================= */
+
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://lh3.googleusercontent.com/d/1Ks1EdzxcIePp0Y7r_c8mAVDQ4qpwJoTP');
@@ -30,9 +27,6 @@
             padding: 15px; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* =========================================
-           CABEÇALHO
-           ========================================= */
         .header-painel, .secao-bloco, .area-status-inferior, .area-status-superior {
             background-color: rgba(15, 23, 42, 0.45) !important;
             backdrop-filter: blur(2px); position: relative; z-index: 1;
@@ -45,12 +39,9 @@
         .header-painel h1 { font-size: 22px; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
         .logo-area { font-weight: bold; font-size: 16px; color: #94a3b8; letter-spacing: 2px; }
 
-        /* =========================================
-           GRID PRINCIPAL E BLOCOS
-           ========================================= */
         .quadro-principal { 
             display: grid; grid-template-columns: 1fr; flex: 1; min-height: 0; 
-            container-type: size; /* LÊ A ALTURA DISPONÍVEL NA TELA DINAMICAMENTE */
+            container-type: size; 
         }
 		
         .grade-grupos {
@@ -76,9 +67,9 @@
 
         .zona-fotos {
             display: grid; 
-            grid-template-columns: 1fr; /* Força apenas 1 coluna para os grupos inativos */
+            grid-template-columns: 1fr;
             grid-auto-rows: 106px; 
-            justify-items: center; /* Centraliza o card na coluna */
+            justify-items: center; 
             gap: 5px; 
             align-content: flex-start; 
             flex: 1; 
@@ -87,9 +78,6 @@
         }
         .zona-fotos::-webkit-scrollbar, .fotos-status-linha::-webkit-scrollbar { width: 0px; }
 
-        /* =========================================
-           STATUS INFERIOR / SUPERIOR
-           ========================================= */
         .area-status-inferior { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
         .linha-status { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: center; }
         .label-status {
@@ -104,20 +92,13 @@
             backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         }
 
-        /* =========================================
-           CARDS DOS VIGILANTES
-           ========================================= */
         .vigilante-container { width: 84px; height: 106px; }
         .fotos-status-linha .vigilante-container { width: 52px !important; height: 66px !important; }
         .fotos-status-linha .vigilante-nome-tag { font-size: 7.5px !important; padding: 1px 0 !important; }
         .fotos-status-linha .vigilante-card div[style*="position: absolute"] { padding: 0px 2px !important; }
         .fotos-status-linha .vigilante-card div[style*="position: absolute"] span { font-size: 7px !important; }
-		
-		/* =========================================
-           CORREÇÃO DO GRUPO ATIVO (ELÁSTICO E AUTOMÁTICO POR TURNO)
-           ========================================= */
         
-        /* GRUPOS A e B (Diurno - Mais colaboradores: fotos um pouco menores para não cortar) */
+
         #bloco-grupo-a.grupo-ativo .zona-fotos,
         #bloco-grupo-b.grupo-ativo .zona-fotos {
             grid-template-columns: repeat(auto-fit, minmax(max(70px, 15cqh), 1fr)); 
@@ -126,7 +107,7 @@
             gap: 6px;
         }
 
-        /* GRUPOS C e D (Noturno - Menos colaboradores: fotos maiores para preencher a tela) */
+
         #bloco-grupo-c.grupo-ativo .zona-fotos,
         #bloco-grupo-d.grupo-ativo .zona-fotos {
             grid-template-columns: repeat(auto-fit, minmax(max(80px, 18cqh), 1fr)); 
@@ -135,7 +116,7 @@
             gap: 8px;
         }
         
-        /* A proporção da foto 3x4 (retrato) se mantém perfeita para todos */
+
         .grupo-ativo .vigilante-container { 
             width: 100%; 
             height: auto; 
@@ -169,9 +150,6 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 4px 4px;
         }
 
-        /* =========================================
-           TOOLTIP
-           ========================================= */
         #global-tooltip {
             position: fixed; display: none; width: 420px; background-color: #ffffff; color: var(--text-dark);
             border: 2px solid #64748b; border-radius: 8px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
@@ -192,11 +170,6 @@
 </head>
 <body>
 
-<!-- =========================================
-         INÍCIO DA RÁDIO FLUTUANTE
-         ========================================= -->
-    
-
     <div class="header-painel">
         <div class="logo-area">ITAIPU BINACIONAL</div>
         <h1>Divisão de Segurança Externa</h1>
@@ -205,19 +178,18 @@
     
     <div class="area-status-superior" style="margin-bottom: 15px;">
         
-        <!-- Mantemos a linha-status original, mas alteramos o grid para 3 colunas -->
+
         <div class="linha-status" style="grid-template-columns: 180px 1fr 380px;">
             
-            <!-- Etiqueta SEOE 100% ORIGINAL (compacta e cinza escuro) -->
+
             <div class="label-status">SEOE</div>
             
-            <!-- Caixa de Fotos SEOE 100% ORIGINAL -->
+
             <div id="container-seoe" class="fotos-status-linha" style="max-height: 100px;"></div>
             
-            <!-- Caixinha do Rádio -->
+
             <div style="height: 70px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; overflow: hidden; position: relative;">
                 
-                <!-- Iframe com 90px para cortar a borda original, sem ativar o fundo branco extra do widget -->
                 <iframe 
                     src="https://radios.live/radio/jovem-pan-news-foz-do-iguacu-105-1-219714?widget=1&amp;maxWidth=1000&amp;maxHeight=0&amp;radius=0&amp;responsive=true&amp;compact=true&amp;target=_blank&amp;rel=follow&amp;bg=%230F172A&amp;text=%23f8fafc&amp;secondary=%2394a3b8&amp;accent=%232563eb&amp;shadow=false&amp;borderWidth=0&amp;type=player&amp;showMetadata=true&amp;showNowPlaying=false&amp;showArtwork=true&amp;autoplay=true&amp;powered=hidden" 
                     title="Rádio Jovem Pan" 
@@ -226,7 +198,6 @@
                     allow="autoplay; fullscreen">
                 </iframe>
                 
-                <!-- Fita de camuflagem de 6px para blindar a renderização do zoom a 150% -->
                 <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 6px; background: #0f172a; pointer-events: none;"></div>
             </div>
 
@@ -265,11 +236,8 @@
 
 agendarAtualizacaoMeiaNoite();
 	
-        /* ==========================================================================
-           1. CONFIGURAÇÕES E ESTADO GERAL
-           ========================================================================== */
         const CONFIG = {
-            URL_API: "https://script.google.com/macros/s/AKfycbyfMiZompnkaTl7qxAPvvNcAiP3ZmUE-KyB_WVh7K5kJnojU4tGITf8jK-2snM94RfLqw/exec",
+            URL_API: "https://script.google.com/macros/s/AKfycbxpDJaByu1lLFHrI_jMJs9V0PskS6ZbNGCtyE4Qlgq3n9rRFi5QahcWGz4P_W6KFMwRbA/exec?api=tv",
             REF_DATE: new Date(2026, 4, 21, 0, 0, 0),
             UPDATE_INTERVAL: 5 * 60 * 1000,
             IDLE_TIME: 3000,
@@ -279,7 +247,10 @@ agendarAtualizacaoMeiaNoite();
 
         const STATE = {
             grupoAtivo: "GRUPO A",
-            timerCursor: null
+            timerCursor: null,
+            grupoExibido: "GRUPO A", 
+            ultimoJson: "", 
+            retry: null    
         };
 
         const DOM = {
@@ -288,9 +259,96 @@ agendarAtualizacaoMeiaNoite();
             dataAtual: document.getElementById('data-atual')
         };
 
-        /* ==========================================================================
-           2. SISTEMA DE PROTEÇÃO (Modo Quiosque)
-           ========================================================================== */
+        const FOTO_VAZIA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="74" height="94" viewBox="0 0 74 94"><rect width="74" height="94" fill="#334155"/><text x="37" y="56" font-family="Arial,sans-serif" font-size="34" font-weight="bold" fill="#ffffff" text-anchor="middle">?</text></svg>');
+
+        const FotoLoader = {
+            MAX_PARALELO: 6,
+            TEMPO_LIMITE: 15000,
+            ativos: 0,
+            fila: [],
+            prontas: new Set(),
+            carregar(url, elemento) {
+                if (!url || url.startsWith('data:')) {
+                    elemento.style.backgroundImage = `url('${url || FOTO_VAZIA}')`;
+                    return;
+                }
+                if (this.prontas.has(url)) {
+                    elemento.style.backgroundImage = `url('${url}')`;
+                    return;
+                }
+                this.fila.push({ url, elemento, tentativas: 0 });
+                setTimeout(() => this.proximo(), 0);
+            },
+            proximo() {
+                while (this.ativos < this.MAX_PARALELO && this.fila.length > 0) {
+                    const item = this.fila.shift();
+                    if (!item.elemento.isConnected) continue;   // o card já saiu da tela
+                    if (this.prontas.has(item.url)) {
+                        item.elemento.style.backgroundImage = `url('${item.url}')`;
+                        continue;
+                    }
+                    this.ativos++;
+                    let terminou = false;
+                    let limite = null;
+                    const img = new Image();
+                    const fim = (ok) => {
+                        if (terminou) return;
+                        terminou = true;
+                        clearTimeout(limite);
+                        this.ativos--;
+                        if (ok) {
+                            this.prontas.add(item.url);
+                            item.elemento.style.backgroundImage = `url('${item.url}')`;
+                        } else {
+                            item.tentativas++;
+                            const espera = Math.min(120000, 2000 * Math.pow(2, Math.min(item.tentativas, 6))) + Math.random() * 1000;
+                            setTimeout(() => { this.fila.push(item); this.proximo(); }, espera);
+                        }
+                        this.proximo();
+                    };
+                    limite = setTimeout(() => { img.src = ''; fim(false); }, this.TEMPO_LIMITE);
+                    img.onload = () => fim(true);
+                    img.onerror = () => fim(false);
+                    img.src = item.url;
+                }
+            }
+        };
+        const RELOGIO = {
+            offset: 0,        
+            pronto: false,    
+            falhou: false,    
+            agora() { return new Date(Date.now() + this.offset); },
+            brasilia() {
+                const partes = new Intl.DateTimeFormat('en-CA', {
+                    timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+                }).formatToParts(this.agora());
+                const n = tipo => parseInt(partes.find(p => p.type === tipo).value, 10);
+                return new Date(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'), n('second'));
+            },
+            async sincronizar() {
+                const url = CONFIG.URL_API.replace('api=tv', 'api=hora');
+                let melhorRtt = Infinity;
+                for (let i = 0; i < 3; i++) {
+                    try {
+                        const t0 = Date.now();
+                        const resp = await fetch(url, { cache: 'no-store' });
+                        const dados = await resp.json();
+                        const t1 = Date.now();
+                        const rtt = t1 - t0;
+                        if (typeof dados.t === 'number' && rtt < melhorRtt) {
+                            melhorRtt = rtt;
+                            this.offset = dados.t - (t0 + rtt / 2);
+                            this.pronto = true;
+                            this.falhou = false;
+                        }
+                    } catch (e) { /* tenta a próxima medição */ }
+                    if (i < 2) await new Promise(r => setTimeout(r, 800));
+                }
+                if (!this.pronto) this.falhou = true;
+            }
+        };
+
         function initKioskMode() {
             document.addEventListener('contextmenu', e => e.preventDefault());
             document.onkeydown = e => {
@@ -314,11 +372,8 @@ agendarAtualizacaoMeiaNoite();
             setTimeout(() => location.reload(), amanha - agora);
         }
 
-        /* ==========================================================================
-           3. MOTOR DE REGRAS DE NEGÓCIO E DADOS
-           ========================================================================== */
         function calcularGrupoDeServico() {
-            const agora = new Date();
+            const agora = RELOGIO.brasilia();
             const hora = agora.getHours();
             let dataHojeZerada = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
             let diferencaTempo = dataHojeZerada.getTime() - CONFIG.REF_DATE.getTime();
@@ -334,7 +389,7 @@ agendarAtualizacaoMeiaNoite();
         }
 
         function converterLinkDrive(url) {
-            if (!url) return 'https://via.placeholder.com/74x94/334155/FFFFFF?text=?';
+            if (!url) return FOTO_VAZIA;
             const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/) || url.match(/id=([a-zA-Z0-9-_]+)/);
             return (match && match[1]) ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200-h250` : url;
         }
@@ -345,21 +400,19 @@ agendarAtualizacaoMeiaNoite();
             if (partes.length !== 3) return { status: false, idade: "" };
             
             let [anoNasc, mesNasc, diaNasc] = [parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2])];
-            let hoje = new Date();
+            let hoje = RELOGIO.brasilia();
             return {
                 status: (hoje.getMonth() === mesNasc && hoje.getDate() === diaNasc),
                 idade: hoje.getFullYear() - anoNasc
             };
         }
 
-        /* ==========================================================================
-           4. RENDERIZAÇÃO E INTERFACE
-           ========================================================================== */
         function atualizarLayoutSanfona(nomeGrupo) {
             let idBlocoAlvo = `bloco-${nomeGrupo.replace(" ", "-").toLowerCase()}`;
             if (!CONFIG.BLOCOS_MAP.hasOwnProperty(idBlocoAlvo)) idBlocoAlvo = "bloco-grupo-a";
 
             // Trava as colunas inativas em 110px (espaço para 1 foto) e expande a ativa para o máximo (1fr)
+            STATE.grupoExibido = idBlocoAlvo.replace('bloco-', '').replace('-', ' ').toUpperCase();
             let tamanhos = ["110px", "110px", "110px", "110px"];
             tamanhos[CONFIG.BLOCOS_MAP[idBlocoAlvo]] = "1fr";
             
@@ -372,7 +425,7 @@ agendarAtualizacaoMeiaNoite();
 
         function ajustarDestaqueIntermitentes() {
             document.querySelectorAll('#container-intermitentes .vigilante-card').forEach(card => {
-                card.getAttribute('data-status-escala') === STATE.grupoAtivo 
+                card.getAttribute('data-status-escala') === STATE.grupoExibido 
                     ? card.classList.add('intermitente-ativo-hoje') 
                     : card.classList.remove('intermitente-ativo-hoje');
             });
@@ -439,29 +492,10 @@ agendarAtualizacaoMeiaNoite();
 
             card.setAttribute('data-status-escala', (vigilante.statusAtual || "").toUpperCase());
             
-            // Controle de Imagem com Exponential Backoff
+            // Controle de Imagem (fila, nova tentativa automática e cache)
             const fotoUrl = converterLinkDrive(vigilante.driveUrl);
             card.style.backgroundColor = "#1e293b";
-            
-            function tentarCarregarImagem(url, elemento, tentativas = 3) {
-                if (!url || url.includes('via.placeholder.com')) {
-                    elemento.style.backgroundImage = `url('${url}')`;
-                    return;
-                }
-                const img = new Image();
-                img.onload = () => elemento.style.backgroundImage = `url('${url}')`;
-                img.onerror = () => {
-                    if (tentativas > 0) {
-                        const tempoEspera = (4 - tentativas) * 1500; // Aguarda 1.5s, 3.0s, 4.5s
-                        setTimeout(() => tentarCarregarImagem(url, elemento, tentativas - 1), tempoEspera);
-                    } else {
-                        elemento.style.backgroundImage = `url('https://via.placeholder.com/74x94/334155/FFFFFF?text=Erro')`;
-                    }
-                };
-                img.src = url;
-            }
-
-            tentarCarregarImagem(fotoUrl, card);
+            FotoLoader.carregar(fotoUrl, card);
 
             const tagSuperior = document.createElement('div');
             tagSuperior.style.cssText = 'position:absolute; top:0; left:0; right:0; background:rgba(0,0,0,0.75); display:flex; justify-content:space-between; padding:1px 3px; font-size:14px; font-weight:bold; color:#fff; border-bottom:1px solid rgba(255,255,255,0.1);';
@@ -501,14 +535,29 @@ agendarAtualizacaoMeiaNoite();
             container.appendChild(wrapper);
         }
 
-        /* ==========================================================================
-           5. ORQUESTRAÇÃO DE DADOS E ROTEAMENTO
-           ========================================================================== */
+        function agendarNovaTentativa() {
+            if (STATE.retry) return;
+            STATE.retry = setTimeout(() => { STATE.retry = null; puxarDadosDoSheets(); }, 30 * 1000);
+        }
+
         async function puxarDadosDoSheets() {
             try {
-                const response = await fetch(CONFIG.URL_API);
-                const listaBruta = await response.json();
-                
+                let texto;
+                const controle = new AbortController();
+                const limiteTempo = setTimeout(() => controle.abort(), 30000);
+                try {
+                    const response = await fetch(CONFIG.URL_API, { cache: 'no-store', signal: controle.signal });
+                    texto = await response.text();
+                } finally {
+                    clearTimeout(limiteTempo);
+                }
+
+                if (texto === STATE.ultimoJson) return;  
+
+                const listaBruta = JSON.parse(texto);
+                if (!Array.isArray(listaBruta) || listaBruta.length === 0) throw new Error("Resposta inesperada do servidor");
+                STATE.ultimoJson = texto;
+
                 limparTodosOsContainers();
 
                 const mapaDadosGeral = {};
@@ -527,12 +576,12 @@ agendarAtualizacaoMeiaNoite();
                     }
                 });
 
-                // SEOE
+
                 listaBruta.filter(v => v.cargo && v.cargo.toUpperCase().includes("SEOE"))
                           .sort((a, b) => a.dataAdmissao - b.dataAdmissao)
                           .forEach(v => adicionarVigilanteNaTela(v, 'container-seoe'));
 
-                // AFASTADOS (Ordenados por Grupo)
+
                 const afastados = listaBruta.filter(v => v.atestado || v.ferias || v.reciclagem);
                 afastados.sort((a, b) => (CONFIG.ORDEM_GRUPOS[a.statusAtual?.toUpperCase()] || 99) - (CONFIG.ORDEM_GRUPOS[b.statusAtual?.toUpperCase()] || 99));
                 afastados.forEach(v => {
@@ -540,7 +589,7 @@ agendarAtualizacaoMeiaNoite();
                     adicionarVigilanteNaTela(v, idContainer);
                 });
 
-                // ROTEAMENTO 3: ATIVOS E SUBSTITUTOS (Ordenados por Posto)
+
                 const ativos = listaBruta.filter(v => !(v.atestado || v.ferias || v.reciclagem) && !(v.cargo && v.cargo.toUpperCase().includes("SEOE")));
                 ativos.sort((a, b) => parseInt((a.numPosto || "").toString().replace(/\D/g, '')) - parseInt((b.numPosto || "").toString().replace(/\D/g, '')));
                 
@@ -550,21 +599,20 @@ agendarAtualizacaoMeiaNoite();
                     const nomeUpper = (v.nome || "").toUpperCase().trim();
                     let vigilanteTratado = { ...v };
 
-                    // 1. INJETA DADOS DO TITULAR SE ELE FOR UM SUBSTITUTO
+
                     if (mapaSubstitutos[nomeUpper]) {
                         vigilanteTratado.statusAtual = mapaSubstitutos[nomeUpper].grupo;
                         vigilanteTratado.titularSubstituido = mapaSubstitutos[nomeUpper].titularSubstituido;
                         vigilanteTratado.motivoSubstituicao = mapaSubstitutos[nomeUpper].motivoSubstituicao;
                     }
 
-                    // 2. TODOS OS ATIVOS (Substitutos ou não, Intermitentes ou não) VÃO PARA A GRADE DE POSTOS
                     const st = vigilanteTratado.statusAtual || "";
                     if (st.includes("GRUPO A")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-a');
                     else if (st.includes("GRUPO B")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-b');
                     else if (st.includes("GRUPO C")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-c');
                     else if (st.includes("GRUPO D")) adicionarVigilanteNaTela(vigilanteTratado, 'container-grupo-d');
 
-                    // 3. SE FOR INTERMITENTE, É DUPLICADO PARA O CONTAINER INFERIOR DE CONTROLE
+
                     if (cargo.includes("INTERMITENTE") || status === "INTERMITENTE") {
                         adicionarVigilanteNaTela(vigilanteTratado, 'container-intermitentes');
                     }
@@ -574,13 +622,10 @@ agendarAtualizacaoMeiaNoite();
 
             } catch (error) {
                 console.error("Erro Crítico ao processar dados da API:", error);
-                // Previsão de ajuste futuro: Exibir alerta na tela se a internet cair.
+                agendarNovaTentativa();   // mantém a tela atual e tenta de novo em 30 segundos
             }
         }
-
-        /* ==========================================================================
-           6. INICIALIZAÇÃO
-           ========================================================================== */
+		
         Object.keys(CONFIG.BLOCOS_MAP).forEach(idBloco => {
             const el = document.getElementById(idBloco);
             let hoverTimer;
@@ -592,7 +637,19 @@ agendarAtualizacaoMeiaNoite();
 
         DOM.grade.addEventListener('mouseleave', calcularGrupoDeServico);
         
-        DOM.dataAtual.innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        function atualizarRelogio() {
+            const agora = RELOGIO.agora();
+            let html = agora.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            if (RELOGIO.pronto || RELOGIO.falhou) {
+                const hora = agora.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+                html += '<span style="margin-left:16px; font-size:24px; font-weight:800; color:#fff;">' + hora + '</span>';
+            }
+            DOM.dataAtual.innerHTML = html;
+        }
+        atualizarRelogio();
+        setInterval(atualizarRelogio, 1000);
+        RELOGIO.sincronizar().then(() => { atualizarRelogio(); calcularGrupoDeServico(); });
+        setInterval(() => RELOGIO.sincronizar(), 60 * 60 * 1000);
         initKioskMode();
         calcularGrupoDeServico(); 
         puxarDadosDoSheets();
