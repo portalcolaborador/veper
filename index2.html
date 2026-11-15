@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carômetro Operacional - Segurança Externa</title>
-    <!--
-        Este arquivo (index2.html no GitHub) só redireciona a TV para o carômetro no Apps Script.
-        Para trocar o endereço ou a chave, altere SOMENTE as duas linhas abaixo (URL_APP e CHAVE_TV)
-        e também a URL do meta refresh.
-    -->
     <meta http-equiv="refresh" content="3;url=https://script.google.com/macros/s/AKfycbxpDJaByu1lLFHrI_jMJs9V0PskS6ZbNGCtyE4Qlgq3n9rRFi5QahcWGz4P_W6KFMwRbA/exec?page=tv&key=f209d80770f5fa836ad9d13f0a4233f3cf47de91">
     <style>
         html, body { margin: 0; height: 100%; background: #1e293b; color: #f8fafc;
@@ -26,7 +21,6 @@
     <script>
         var URL_APP   = "https://script.google.com/macros/s/AKfycbxpDJaByu1lLFHrI_jMJs9V0PskS6ZbNGCtyE4Qlgq3n9rRFi5QahcWGz4P_W6KFMwRbA/exec";
         var CHAVE_TV  = "f209d80770f5fa836ad9d13f0a4233f3cf47de91";
-        // replace() não deixa esta página no histórico (o "voltar" da TV não cai aqui de novo)
         window.location.replace(URL_APP + "?page=tv&key=" + encodeURIComponent(CHAVE_TV));
     </script>
 </body>
