@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Colaborador</title>
-    <!--
-        Este arquivo (página dos colaboradores no GitHub) só redireciona para o Portal do Colaborador no Apps Script.
-        Para trocar o endereço, altere a URL_APP abaixo E a URL do meta refresh.
-        O portal não usa chave: o colaborador entra com matrícula + CPF + data de nascimento.
-    -->
     <meta http-equiv="refresh" content="2;url=https://script.google.com/macros/s/AKfycbxpDJaByu1lLFHrI_jMJs9V0PskS6ZbNGCtyE4Qlgq3n9rRFi5QahcWGz4P_W6KFMwRbA/exec?page=portal">
     <style>
         html, body { margin: 0; height: 100%; background: #0a1730; color: #f8fafc;
@@ -30,7 +25,6 @@
     </div>
     <script>
         var URL_APP = "https://script.google.com/macros/s/AKfycbxpDJaByu1lLFHrI_jMJs9V0PskS6ZbNGCtyE4Qlgq3n9rRFi5QahcWGz4P_W6KFMwRbA/exec";
-        // replace() não deixa esta página no histórico (o "voltar" do celular não cai aqui de novo)
         window.location.replace(URL_APP + "?page=portal");
     </script>
 </body>
